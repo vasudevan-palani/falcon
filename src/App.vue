@@ -77,7 +77,7 @@ export default defineComponent({
       <div id="drag-region">
 
         <div id="window-title">
-          <span>Post Box</span>
+          <span>Falcon</span>
         </div>
       </div>
       <div v-if="isWindows()" class="window-button-container">

@@ -1,5 +1,5 @@
 {
-  "name": "post-box",
+  "name": "falcon",
   "version": "1.2.1",
   "main": "dist-electron/main/index.js",
   "description": "Post Box Application",
@@ -13,9 +13,9 @@
     "vue3",
     "vue"
   ],
-  "repository": "https://github.com/vasudevan-palani/post-box",
+  "repository": "https://github.com/vasudevan-palani/falcon",
   "electron-updater": {
-    "repo": "vasudevan-palani/post-box",
+    "repo": "vasudevan-palani/falcon",
     "provider": "github",
     "autoDownload": true,
     "autoInstall": true

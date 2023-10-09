@@ -66,16 +66,16 @@ const saveRequest = () => {
 }
 
 onMounted(()=>{
-    console.log("in req container",props.item)
-    if (props.item == undefined){
-        return
-    }
-    httpurl.value = props.item.data.url;
-    httpmethod.value = props.item.data.httpmethod;
-    requestName.value = props.item.data.requestName;
-    params.value = props.item.data.params;
-    headers.value = props.item.data.headers;
-    requestBody.value = JSON.stringify(JSON.parse(props.item.data.body), null, 4);
+    // console.log("in req container",props.item)
+    // if (props.item == undefined){
+    //     return
+    // }
+    // httpurl.value = props.item.url;
+    // httpmethod.value = props.item.httpmethod;
+    // requestName.value = props.item.requestName;
+    // params.value = props.item.params;
+    // headers.value = props.item.headers;
+    // requestBody.value = JSON.stringify(JSON.parse(props.item.body), null, 4);
 })
 
 //Utility function
@@ -86,13 +86,13 @@ watchEffect(() => {
     if (props.item == undefined){
         return
     }
-    httpurl.value = props.item.data.url;
-    httpmethod.value = props.item.data.httpmethod;
-    requestName.value = props.item.data.requestName;
-    params.value = props.item.data.params;
-    headers.value = props.item.data.headers;
-    if ( props.item.data.body != undefined && props.item.data.body != ''){
-        requestBody.value = JSON.stringify(JSON.parse(props.item.data.body), null, 4);
+    httpurl.value = props.item.url;
+    httpmethod.value = props.item.httpmethod;
+    requestName.value = props.item.requestName;
+    params.value = props.item.params;
+    headers.value = props.item.headers;
+    if ( props.item.body != undefined && props.item.body != ''){
+        requestBody.value = JSON.stringify(JSON.parse(props.item.body), null, 4);
     }
     
 });

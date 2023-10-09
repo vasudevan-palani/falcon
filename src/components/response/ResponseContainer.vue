@@ -14,10 +14,10 @@ import themeChromeUrl from "ace-builds/src-noconflict/theme-chrome?url";
 ace.config.setModuleUrl("ace/theme/chrome", themeChromeUrl);
 ace.config.setModuleUrl("ace/mode/json_worker", workerJsonUrl);
 
-import {NameValueEnabled} from '../common/model';
+import { NameValueEnabled } from '../common/model';
 
 //Properties
-const props = defineProps<{item:any}>();
+const props = defineProps<{ item: any }>();
 const emit = defineEmits([]);
 
 // Variables
@@ -33,9 +33,9 @@ const responseStatusText = ref<string>()
 
 //Event Handlers
 //
-const handleTabClick = () => {};
+const handleTabClick = () => { };
 
-const onResponseBodyChange = () => {};
+const onResponseBodyChange = () => { };
 
 // Click handlers
 //
@@ -43,24 +43,24 @@ const onResponseBodyChange = () => {};
 //Utility function
 //
 
-onMounted(()=>{
-    if (props.item?.response != undefined){
-        responseBody.value = "";
-        responseHeaders.value = props.item.response.headers
-        responseStatus.value = props.item.response.status
-        responseStatusText.value = props.item.response.statusText
-    }
+onMounted(() => {
+  if (props.item?.response != undefined) {
+    responseBody.value = "";
+    responseHeaders.value = props.item.response.headers
+    responseStatus.value = props.item.response.status
+    responseStatusText.value = props.item.response.statusText
+  }
 })
 
 watchEffect(() => {
-    console.log(props.item)
-    if (props.item?.response != undefined){
-        responseBody.value = "";
-        responseHeaders.value = props.item.response.headers
-        responseStatus.value = props.item.response.status
-        responseStatusText.value = props.item.response.statusText
-        responseBody.value = JSON.stringify(props.item.response?.responseJson,null,4)
-    }
+  console.log(props.item)
+  if (props.item?.response != undefined) {
+    responseBody.value = "";
+    responseHeaders.value = props.item.response.headers
+    responseStatus.value = props.item.response.status
+    responseStatusText.value = props.item.response.statusText
+    responseBody.value = JSON.stringify(props.item.response?.responseJson, null, 4)
+  }
 });
 </script>
 
@@ -71,51 +71,42 @@ watchEffect(() => {
         <el-col :span="18">
           <el-text> Response </el-text>
         </el-col>
-        <el-col :span="6" class="status-col">
+        <el-col :span="6" class="status-col" v-if="responseStatus !=undefined">
           <el-text> Status : {{ responseStatus }} ({{ responseStatusText }}) </el-text>
         </el-col>
       </el-row>
-      <el-row>
+      <el-row v-if="responseStatus !=undefined">
         <el-col :span="24">
-          <el-tabs
-            v-model="activeName"
-            class="aws-tabs"
-            @tab-click="handleTabClick"
-          >
+          <el-tabs v-model="activeName" class="aws-tabs" @tab-click="handleTabClick">
             <el-tab-pane name="headers">
-                <template #label>
-                    
-                        <el-text>Headers <el-text v-if="responseHeaders != undefined && responseHeaders.length >0? true:false" type="primary">({{ responseHeaders?.length }})</el-text></el-text>
-                    
-                </template>
+              <template #label>
+
+                <el-text>Headers <el-text v-if="responseHeaders != undefined && responseHeaders.length > 0 ? true : false"
+                    type="primary">({{ responseHeaders?.length }})</el-text></el-text>
+
+              </template>
               <el-row class="form-row" v-for="header in responseHeaders">
                 <el-col :span="11">
-                    <el-text>{{ header.name }}</el-text>
+                  <el-text>{{ header.name }}</el-text>
                 </el-col>
                 <el-col :span="11">
-                    <el-text>{{ header.value }}</el-text>
+                  <el-text>{{ header.value }}</el-text>
                 </el-col>
                 <el-col :span="12"></el-col>
-                
+
               </el-row>
             </el-tab-pane>
             <el-tab-pane label="Body" name="body">
               <el-row class="form-row">
                 <el-col>
-                  <v-ace-editor
-                    v-model:value="responseBody"
-                    @update:value="onResponseBodyChange"
-                    lang="json"
-                    :options="{
-                      useWorker: true,
-                      showGutter: false,
-                      highlightActiveLine: false,
-                      showPrintMargin: false,
-                      readOnly: true,
-                      wrap:true
-                    }"
-                    style="height: 300px"
-                  />
+                  <v-ace-editor v-model:value="responseBody" @update:value="onResponseBodyChange" lang="json" :options="{
+                    useWorker: true,
+                    showGutter: false,
+                    highlightActiveLine: false,
+                    showPrintMargin: false,
+                    readOnly: true,
+                    wrap: true
+                  }" style="height: 300px" />
                 </el-col>
               </el-row>
             </el-tab-pane>
@@ -127,9 +118,10 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-.status-col{
-    text-align: right;
+.status-col {
+  text-align: right;
 }
+
 .response {
   border: #EEE 1px solid;
   border-radius: 5px;

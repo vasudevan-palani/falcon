@@ -5,6 +5,16 @@
 import { reactive, ref, watchEffect, onMounted } from "vue";
 import { FolderIcon,FileIcon } from "@vue-icons/feather";
 
+import {truncateText} from "../services/utils";
+import { ElTreeV2 } from 'element-plus'
+import type { TreeNode } from 'element-plus/es/components/tree-v2/src/types'
+
+interface Tree {
+  id: string
+  label: string
+  children?: Tree[]
+}
+
 //Properties
 const props = defineProps<{ items: any[],hasMore:boolean,filter:string }>();
 const emit = defineEmits(["itemSelected","clickedMore"]);
@@ -17,6 +27,12 @@ const viewItems  = ref<any[]>([]);
 //
 let selectedItem:any = undefined
 let selectedIndex:number|undefined = undefined
+
+const treeprops = {
+  value: 'id',
+  label: 'label',
+  children: 'children',
+}
 
 //Event Handlers
 //
@@ -47,16 +63,6 @@ const onClickedMore = ()=>{
 }
 
 
-//Utility function
-//
-const truncateText = (text:string, maxLength:number) => {
-      if (text.length <= maxLength) {
-        return text; // Return the original text if it's shorter than or equal to maxLength
-      } else {
-        return text.slice(0, maxLength) + '...'; // Truncate and add ellipsis
-      }
-}
-
 watchEffect(()=>{
 
   viewItems.value = props.items
@@ -72,11 +78,31 @@ watchEffect(()=>{
     viewItems.value = filterItems
   }
 })
+const query = ref('')
+const treeRef = ref<InstanceType<typeof ElTreeV2>>()
+const onQueryChanged = (query: string) => {
+  treeRef.value!.filter(query)
+}
+const filterMethod = (query: string, node: TreeNode) => {
+  return node.label!.includes(query)
+}
 </script>
 
 <template>
   <div class="files">
-    <div v-for="(item, index) in viewItems">
+    <el-input
+    v-model="query"
+    placeholder="Please enter keyword"
+    @input="onQueryChanged"
+  />
+  <el-tree-v2
+    ref="treeRef"
+    :data="viewItems"
+    :props="treeprops"
+    :filter-method="filterMethod"
+    :height="208"
+  />
+    <!--div v-for="(item, index) in viewItems">
       <el-link v-if="item.isLeaf == false" :icon="FolderIcon" :type="item.selected ? 'primary' : 'default'" @click="() => selectItem(item,index)" :underline="false"
         :title="item.Name">&nbsp;&nbsp;{{ truncateText(item.Name,30) }}</el-link>
         <el-link v-if="item.isLeaf == true" :icon="FileIcon" :type="item.selected ? 'primary' : 'default'" @click="() => selectItem(item,index)" :underline="false"
@@ -84,7 +110,7 @@ watchEffect(()=>{
     </div>
     <div>
       <el-link v-if="hasMore" type="primary" @click="onClickedMore">More..</el-link>
-    </div>
+    </div-->
   </div>
 </template>
 
@@ -95,7 +121,7 @@ watchEffect(()=>{
   padding: 10px;
   margin: 10px;
   max-height: 900px;
-  height:840px;
+  height:795px;
   overflow-y: scroll;
 }
 </style>

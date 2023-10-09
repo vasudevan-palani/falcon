@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain, autoUpdater } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, autoUpdater,dialog } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 
@@ -90,6 +90,16 @@ app.whenReady().then(()=>{
   createWindow()
   let position1 = win.getPosition()
   console.log(position1)
+  ipcMain.on('open-file-dialog', function (event) {
+    dialog.showOpenDialog(win,{
+      properties: ['openDirectory']
+    }).then((result)=>{
+      let filepaths = result.filePaths
+      console.log(result)
+      event.sender.send('selected-folder', filepaths)
+    })
+  })
+
   ipcMain.on('dblclick-navbar', () => {
     if(win.isMaximized())
     {

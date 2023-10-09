@@ -5,7 +5,7 @@ import ResponseContainer from './response/ResponseContainer.vue';
 import WorkspaceFolder from './WorkspaceFolder.vue';
 import fetch from 'node-fetch';
 import { NameValueEnabled } from "./common/model";
-
+const fs = require('fs')
 //Properties
 const props = defineProps<{  }>();
 const emit = defineEmits([]);
@@ -21,8 +21,18 @@ const item = ref<any>()
 //
 
 const onRequestSelected = (itemSelected:any) => {
-  console.log("Home::requestSelected",itemSelected.data)
-  item.value = itemSelected
+  console.log("Home::requestSelected",itemSelected)
+
+  readFileContent(itemSelected?.id,(err:any,data:any)=>{
+    if(err){
+
+    }
+    else{
+      item.value = JSON.parse(data)
+    }
+  })
+
+  
 }
 
 const onSendRequest = (request:any)=>{
@@ -97,6 +107,16 @@ const onSendRequest = (request:any)=>{
 
 //Utility function
 //
+
+function readFileContent(filePath:string, callback:any) {
+  fs.readFile(filePath, 'utf8', (err:any, data:any) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+    callback(null, data);
+  });
+}
 
 
 </script>
