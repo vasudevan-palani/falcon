@@ -9,6 +9,7 @@ import { NameValueEnabled } from "./common/model";
 import { ipcRenderer } from "electron";
 
 import {truncateText} from '../services/utils'
+import Environment from './settings/Environment.vue'
 
 const fs = require('fs')
 //Properties
@@ -20,6 +21,7 @@ const emit = defineEmits([]);
 const item = ref<any>()
 const workspace = ref("")
 const environment = ref("default")
+const environmentsFormVisible = ref(false)
 
 //Global variables
 //
@@ -164,7 +166,7 @@ function readFileContent(filePath: string, callback: any) {
       </el-col>
       
       <el-col :span="6" class="environment-col">
-        <el-text>Environment : </el-text>
+        <el-link @click="environmentsFormVisible=true" type="primary">Environment:&nbsp;</el-link>
         <el-select v-model="environment" class="m-2" placeholder="Select" size="default">
           <el-option v-for="item in environments" :key="item.label" :label="item.label" :value="item.value" />
         </el-select>
@@ -181,6 +183,11 @@ function readFileContent(filePath: string, callback: any) {
         <ResponseContainer :item="item"></ResponseContainer>
       </el-col>
     </el-row>
+
+    <el-dialog v-model="environmentsFormVisible" title="Environments" width="80%" draggable>
+      <Environment @on-save="environmentsFormVisible = false"/>
+    </el-dialog>
+
   </div>
 </template>
 
