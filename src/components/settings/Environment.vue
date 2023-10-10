@@ -4,6 +4,8 @@
 //
 import { reactive, ref, watchEffect, onMounted } from "vue";
 import { SaveIcon, Trash2Icon, PlusIcon } from "@vue-icons/feather";
+import {EnvironmentService} from '../../services/EnvironmentService';
+import {NotificationService} from '../../services/NotificationService';
 
 //Properties
 const props = defineProps<{}>();
@@ -36,39 +38,43 @@ const addEnvironmentParam = (env: string) => {
 
 const saveEnvironments = () => {
     console.log(environments.value)
-    emit('onSave')
+    EnvironmentService.updateAll(environments.value).then((data)=>{
+        NotificationService.showMessage("Environments Saved.");
+        emit('onSave')
+    }).catch((err)=>{
+        NotificationService.showMessage("Unable to save." + err);
+    })
+    
 }
 
 const addEnvironment = ()=>{
-    environments.value.push({
-        "name":newEnv.value,
-        "label":newEnv.value,
-        "params" : []
-    })
+    if (newEnv.value){
+        environments.value.push({
+            "name":newEnv.value,
+            "label":newEnv.value,
+            "params" : []
+        })
+    }
 }
 
 //Utility function
 //
 
+
+
+
+
 onMounted(() => {
-    environments.value = [
-        {
-            "label": "default",
-            "name": "default",
-            "params": [
-                {
-                    "name": "sat_client_id",
-                    "value": "989734979",
-                    "enabled": true
-                },
-                {
-                    "name": "sat_client_secret",
-                    "value": "21345",
-                    "enabled": true
-                }
-            ]
-        }
-    ]
+    EnvironmentService.getAll().then(data=>{
+        console.log("read environemnts",data)
+        environments.value = data
+    }).catch(err=>{
+        environments.value = [{
+            "name":"default",
+            "label" : "default",
+            "params" : []
+        }]
+    })
 })
 
 watchEffect(() => {
@@ -83,7 +89,7 @@ watchEffect(() => {
             <el-input v-model="newEnv" placeholder="Name"></el-input>
         </el-col>
         <el-col :span="5">
-            <el-button type="primary" :icon="PlusIcon" @click="addEnvironment">New Environment</el-button>
+            <el-button type="primary" :icon="PlusIcon" @click="addEnvironment" :enabled="newEnv != undefined">New Environment</el-button>
        </el-col> 
        <el-col :span="7"></el-col>
     </el-row>

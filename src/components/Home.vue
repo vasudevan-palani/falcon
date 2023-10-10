@@ -3,13 +3,19 @@ import { ref, watchEffect } from "vue";
 import RequestContainer from './request/RequestContainer.vue';
 import ResponseContainer from './response/ResponseContainer.vue';
 import WorkspaceFolder from './WorkspaceFolder.vue';
-import { FolderIcon, SettingsIcon,ExternalLinkIcon,DownloadIcon } from "@vue-icons/feather";
+import { FolderIcon, SettingsIcon, ExternalLinkIcon, DownloadIcon } from "@vue-icons/feather";
 import fetch from 'node-fetch';
 import { NameValueEnabled } from "./common/model";
 import { ipcRenderer } from "electron";
 
-import {truncateText} from '../services/utils'
+import { truncateText, readFileContent } from '../services/utils'
 import Environment from './settings/Environment.vue'
+
+import { ProfileService } from '../services/ProfileService'
+import { NotificationService } from '../services/NotificationService'
+import { EnvironmentService } from '../services/EnvironmentService'
+
+const mustache = require('mustache');
 
 const fs = require('fs')
 //Properties
@@ -27,8 +33,8 @@ const environmentsFormVisible = ref(false)
 //
 const environments = [
   {
-    "value" : "default",
-    "label" : "default"
+    "value": "default",
+    "label": "default"
   }
 ]
 
@@ -38,12 +44,19 @@ ipcRenderer.on('selected-folder', function (event, path) {
   //do what you want with the path/file selected, for example:
   console.log(path)
   workspace.value = path[0];
+  ProfileService.update({
+    "workspace": workspace.value
+  }).then((data: any) => {
+    NotificationService.showMessage("Profile Saved.")
+  }).catch((err: any) => {
+    NotificationService.showMessage("UNable to save Profile.")
+  })
+
 });
 
 
 const onRequestSelected = (itemSelected: any) => {
   console.log("Home::requestSelected", itemSelected)
-
   readFileContent(itemSelected?.id, (err: any, data: any) => {
     if (err) {
 
@@ -52,71 +65,88 @@ const onRequestSelected = (itemSelected: any) => {
       item.value = JSON.parse(data)
     }
   })
-
-
 }
 
-const onSendRequest = (request: any) => {
-  let headers: any = {}
+const onSendRequest = (requestTemplate: any) => {
 
-  for (let headerIndex in request.headers) {
-    let headerEnabled = request.headers[headerIndex].enabled;
-    let headerName: string = request.headers[headerIndex].name;
-    let headerValue = request.headers[headerIndex].value;
-    if (headerEnabled == true) {
-      headers[headerName] = headerValue
-    }
-
-  }
-  let url = request.httpurl
-
-  if (request.params.length > 0) {
-    url = url + "?"
-    for (let paramIndex in request.params) {
-      let paramName = request.params[paramIndex].name
-      let paramValue = request.params[paramIndex].value
-      url = url + `${paramName}=${paramValue}&`
-    }
-  }
-  console.log(url)
-  //return;
-
-  let options: any = {
-    method: request.httpmethod,
-    headers: headers
-  }
-
-  if (request.httpmethod == "post") {
-    options.body = request.body;
-  }
-
-  console.log(headers)
-  fetch(url, options).then((response: any) => {
-    console.log(response, response.status, response.statusText)
-
-
-    response.json().then((data: any) => {
-
-      let responseHeaders: NameValueEnabled[] = []
-      response.headers.forEach((value: any, key: any) => {
-        responseHeaders.push({
-          "name": key,
-          "value": value,
-          "enabled": true
+  EnvironmentService.getAll().then((data: any) => {
+    let envdata:any = {}
+    data.map((env: any) => {
+    
+      if (env.name == environment.value) {
+         env.params.map((param:any)=>{
+          envdata[param.name] = param.value
         })
-      })
+      }
+    })
+    console.log(requestTemplate,envdata)
+    const requestString = mustache.render(JSON.stringify(requestTemplate), envdata);
+    console.log(requestString)
 
-      item.value.response = {
-        "status": response.status,
-        "statusText": response.statusText,
-        "headers": responseHeaders,
-        "responseJson": data
+    let request = JSON.parse(requestString)
+
+    let headers: any = {}
+
+    for (let headerIndex in request.headers) {
+      let headerEnabled = request.headers[headerIndex].enabled;
+      let headerName: string = request.headers[headerIndex].name;
+      let headerValue = request.headers[headerIndex].value;
+      if (headerEnabled == true) {
+        headers[headerName] = headerValue
       }
 
+    }
+    let url = request.httpurl
+
+    if (request.params.length > 0) {
+      url = url + "?"
+      for (let paramIndex in request.params) {
+        let paramName = request.params[paramIndex].name
+        let paramValue = request.params[paramIndex].value
+        url = url + `${paramName}=${paramValue}&`
+      }
+    }
+    console.log(url)
+    //return;
+
+    let options: any = {
+      method: request.httpmethod,
+      headers: headers
+    }
+
+    if (request.httpmethod == "post") {
+      options.body = request.body;
+    }
+
+    console.log(headers)
+    fetch(url, options).then((response: any) => {
+      console.log(response, response.status, response.statusText)
+
+
+      response.json().then((data: any) => {
+
+        let responseHeaders: NameValueEnabled[] = []
+        response.headers.forEach((value: any, key: any) => {
+          responseHeaders.push({
+            "name": key,
+            "value": value,
+            "enabled": true
+          })
+        })
+
+        item.value.response = {
+          "status": response.status,
+          "statusText": response.statusText,
+          "headers": responseHeaders,
+          "responseJson": data
+        }
+
+      })
+
+    }).catch((err: any) => {
+      console.log(err)
     })
 
-  }).catch((err: any) => {
-    console.log(err)
   })
 
 }
@@ -130,20 +160,6 @@ const chooseWorkspace = () => {
 
 
 
-//Utility function
-//
-
-function readFileContent(filePath: string, callback: any) {
-  fs.readFile(filePath, 'utf8', (err: any, data: any) => {
-    if (err) {
-      callback(err, null);
-      return;
-    }
-    callback(null, data);
-  });
-}
-
-
 </script>
 
 <template>
@@ -154,25 +170,25 @@ function readFileContent(filePath: string, callback: any) {
         <el-button @click="chooseWorkspace">Choose</el-button>
       </el-col>
     </el-row>
-    <el-row class="settings-row">
+    <el-row class="settings-row" v-if="workspace != ''">
       <el-col :span="5">
         <el-button class="import-button" :icon="DownloadIcon">Import</el-button>
         <el-button class="export-button" :icon="ExternalLinkIcon">Export</el-button>
       </el-col>
-      
+
       <el-col :span="13" class="middle-menu">
         <el-text :title="workspace">Workspace : {{ truncateText(workspace, 100) }} &nbsp;&nbsp;</el-text>
         <el-button :icon="FolderIcon" @click="chooseWorkspace">Change</el-button>
       </el-col>
-      
+
       <el-col :span="6" class="environment-col">
-        <el-link @click="environmentsFormVisible=true" type="primary">Environment:&nbsp;</el-link>
+        <el-link @click="environmentsFormVisible = true" type="primary">Environment:&nbsp;</el-link>
         <el-select v-model="environment" class="m-2" placeholder="Select" size="default">
           <el-option v-for="item in environments" :key="item.label" :label="item.label" :value="item.value" />
         </el-select>
-        <el-button  class="settings-button" :icon="SettingsIcon">Settings</el-button>
+        <el-button class="settings-button" :icon="SettingsIcon">Settings</el-button>
       </el-col>
-      
+
     </el-row>
     <el-row v-if="workspace != ''">
       <el-col :span="5">
@@ -185,7 +201,7 @@ function readFileContent(filePath: string, callback: any) {
     </el-row>
 
     <el-dialog v-model="environmentsFormVisible" title="Environments" width="80%" draggable>
-      <Environment @on-save="environmentsFormVisible = false"/>
+      <Environment @on-save="environmentsFormVisible = false" />
     </el-dialog>
 
   </div>
@@ -198,23 +214,26 @@ function readFileContent(filePath: string, callback: any) {
   padding-bottom: 10px;
   height: 100%;
 }
-.middle-menu{
+
+.middle-menu {
   text-align: left;
 }
+
 .empty-workspace-row {
   height: 100%;
   align-items: center;
 }
 
-.settings-button{
+.settings-button {
   margin-left: 10px;
-  margin-right:10px;
+  margin-right: 10px;
 }
 
 .empty-workspace-message {
   margin-bottom: 15px;
 }
-.environment-col{
+
+.environment-col {
   text-align: end;
 }
 
@@ -222,5 +241,4 @@ function readFileContent(filePath: string, callback: any) {
   text-align: left;
   margin-top: 7px;
   margin-left: 10px;
-}
-</style>
+}</style>
