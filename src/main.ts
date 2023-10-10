@@ -5,13 +5,8 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 
 import App from './App.vue'
-import './samples/node-api'
 
 import {createRouter, createWebHistory} from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import VueComponents from './components/VueComponents.vue'
-import Inputs from './components/forms/Inputs.vue'
-import Aws from './components/settings/Aws.vue'
 import Home from './components/Home.vue'
 
 const routes = [

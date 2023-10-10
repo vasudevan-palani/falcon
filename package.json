@@ -32,7 +32,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/aws-sdk": "^2.7.0",
     "@vitejs/plugin-vue": "^4.3.3",
     "electron": "^26.0.0",
     "electron-builder": "^24.6.3",
@@ -45,7 +44,6 @@
   },
   "dependencies": {
     "@vue-icons/feather": "^1.0.19",
-    "aws-sdk": "^2.1466.0",
     "electron-drag": "^2.0.0",
     "element-plus": "^2.3.14",
     "multi-ini": "^2.3.2",
