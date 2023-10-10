@@ -110,18 +110,17 @@ watchEffect(() => {
                   >Save</el-button
                 >
         </el-col>
-        <el-col :span="22">
+        <el-col :span="22" >
             <el-input
                   v-model="requestName"
                   class="w-50 m-2"
-                  placeholder="Request Name"
+                  placeholder="Name"
                 />
-        </el-col>
-        
+        </el-col>        
       </el-row>
       <el-row class="url-row">
         <el-col :span="2">
-            <el-select v-model="httpmethod" class="m-2" placeholder="Select" size="default">
+            <el-select v-model="httpmethod" class="m-2" placeholder="Method" size="default">
                 <el-option
                     v-for="item in httpmethods"
                     :key="item.label"
@@ -134,7 +133,7 @@ watchEffect(() => {
             <el-input
                   v-model="httpurl"
                   class="w-50 m-2"
-                  placeholder="request url"
+                  placeholder="Url"
                 />
         </el-col>
         <el-col :span="2" class="send-button-col">
@@ -242,6 +241,9 @@ watchEffect(() => {
 </template>
 
 <style scoped>
+.environment{
+  text-align: end;
+}
 .margin-right-10px{
     margin-right: 10px;
 }
@@ -272,7 +274,7 @@ watchEffect(() => {
   padding: 10px;
   margin-top: 10px;
   margin-right: 10px;
-  height: 460px;
+  height: 450px;
   overflow-y: scroll;
   text-align: left;
 }

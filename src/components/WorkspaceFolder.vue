@@ -9,14 +9,12 @@ import {truncateText} from "../services/utils";
 const path = require('path');
 const fs = require('fs');
 
-
-
 //interfaces
 //
 
 
 //Properties
-const props = defineProps<{msg:boolean}>();
+const props = defineProps<{msg:boolean,workspaceDir:string}>();
 const emit = defineEmits(["onRequestClicked"]);
 
 // Variables
@@ -79,7 +77,8 @@ const scanWorkspace = (dir:string) => {
 }
 
 onMounted(()=>{
-
+  workspaceDirectory.value = props.workspaceDir
+  scanWorkspace(props.workspaceDir)
 })
 
 watchEffect(() => {
@@ -93,17 +92,8 @@ watchEffect(() => {
   <el-row>
     <el-text v-if="error != ''" type="danger">{{ error }}</el-text>
   </el-row>
-  <el-row v-if="workspaceDirectory == ''">
-    <el-col :span="24">
-    <div><el-text>Please select a workspace directory</el-text></div>
-    <el-button @click="chooseWorkspace">Choose</el-button>
-  </el-col>
-  </el-row>
   <el-row v-if="workspaceDirectory != ''" class="workspace-folder-row">
-    <el-col>
-      <el-text :title="workspaceDirectory">{{ truncateText(workspaceDirectory,38) }} &nbsp;&nbsp;</el-text>
-      <el-button :icon="FolderIcon" @click="chooseWorkspace"></el-button>
-    </el-col>
+    
   </el-row>
   <ListFiles :items="items" @on-file-select="onFileSelect"></ListFiles>
 </template>

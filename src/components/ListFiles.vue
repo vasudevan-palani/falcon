@@ -21,6 +21,7 @@ interface Tree {
 // Variables
 //
 const filter = ref("");
+const fileList = ref([])
 
 //Global variables
 //
@@ -64,9 +65,14 @@ const filterMethod = (query: string, node: TreeNode) => {
 //Utility function
 //
 
+onMounted(()=>{
+  fileList.value = props.items
+})
+
 
 watchEffect(()=>{
-
+  fileList.value = props.items
+  console.log(props.items)
 })
 </script>
 
@@ -82,14 +88,16 @@ watchEffect(()=>{
       :suffix-icon="SearchIcon"
     />
   </el-row>
+    <el-col :span="24" v-if="fileList.length > 0">
     <el-tree-v2 class="collection-list"
     ref="treeRef"
     :filter-method="filterMethod"
     @node-click = "itemSelected"
-    :data="items"
+    :data="fileList"
     :props = "treeprops"
     :height="208"
   />
+  </el-col>
 </template>
 
 <style scoped>
@@ -98,7 +106,7 @@ watchEffect(()=>{
   border: #EEE 1px solid;
   border-radius: 5px;
   margin: 10px;
-  height:815px;
+  height:836px;
 }
 .searchfilter {
   margin: 10px;

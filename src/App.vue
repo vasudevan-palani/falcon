@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ref, defineComponent } from 'vue';
-import { SettingsIcon, FileIcon, MinusIcon, PlusIcon,XIcon } from '@vue-icons/feather';
+import { SettingsIcon, FileIcon, MinusIcon, PlusIcon,XIcon, LayersIcon, DownloadIcon,ExternalLinkIcon } from '@vue-icons/feather';
 import { useRouter, useRoute } from 'vue-router';
 const { ipcRenderer } = require('electron');
 
@@ -63,6 +63,9 @@ export default defineComponent({
             MinusIcon : MinusIcon,
             PlusIcon : PlusIcon,
             XIcon : XIcon,
+            LayersIcon: LayersIcon,
+            DownloadIcon : DownloadIcon,
+            ExternalLinkIcon:ExternalLinkIcon,
             isWindows:isWindows,
             minimizeApp : minimizeApp,
             closeApp : closeApp
@@ -84,7 +87,7 @@ export default defineComponent({
             <el-button @click="minimizeApp" class="window-buttons" :icon="MinusIcon"/>
             <el-button @click="dblclickNavBar" class="window-buttons" :icon="PlusIcon"/>
             <el-button @click="closeApp" class="window-buttons" :icon="XIcon"/>
-      </div>     
+      </div>
     </div>
 
   <el-row class="body-container">
@@ -109,7 +112,13 @@ export default defineComponent({
   margin-bottom: 20px;
 }
 .body-container{
-  padding: 1rem;
+  padding: 0.5rem;
+  height: 100%;
+}
+.menu-container{
+  margin-top: 10px;
+  margin-left: 10px;
+  text-align: start;
 }
 .flex-center {
   display: flex;
@@ -122,6 +131,10 @@ export default defineComponent({
   padding: 1.5em;
   will-change: filter;
   transition: filter 300ms;
+}
+
+.home-area{
+  height: 100%;
 }
 
 .logo.electron:hover {
