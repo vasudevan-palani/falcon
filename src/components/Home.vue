@@ -3,7 +3,7 @@ import { onMounted, ref, watchEffect } from "vue";
 import RequestContainer from './request/RequestContainer.vue';
 import ResponseContainer from './response/ResponseContainer.vue';
 import WorkspaceFolder from './WorkspaceFolder.vue';
-import { FolderIcon, SettingsIcon, ExternalLinkIcon, DownloadIcon } from "@vue-icons/feather";
+import { FolderIcon, SettingsIcon, ExternalLinkIcon, DownloadIcon,RefreshCwIcon } from "@vue-icons/feather";
 import fetch from 'node-fetch';
 import { NameValueEnabled } from "./common/model";
 import { ipcRenderer } from "electron";
@@ -80,6 +80,8 @@ const onSaveRequest = (request:any) => {
     NotificationService.showMessage("Failed to save request. "+err)
   })
 }
+
+
 
 const onSendRequest = (requestTemplate: any) => {
 
@@ -168,6 +170,15 @@ const onSendRequest = (requestTemplate: any) => {
 // Click handlers
 //
 
+const refreshWorkspace = () => {
+  let workspace_val = workspace.value
+  workspace.value = ""
+  setTimeout(()=>{
+    workspace.value = workspace_val
+  })
+  
+}
+
 const chooseWorkspace = () => {
   ipcRenderer.send('open-file-dialog')
 }
@@ -198,6 +209,7 @@ onMounted(()=>{
 
       <el-col :span="13" class="middle-menu">
         <el-text :title="workspace">Workspace : {{ truncateText(workspace, 100) }} &nbsp;&nbsp;</el-text>
+        <el-button :icon="RefreshCwIcon" @click="refreshWorkspace">Refresh</el-button>
         <el-button :icon="FolderIcon" @click="chooseWorkspace">Change</el-button>
       </el-col>
 
@@ -212,7 +224,7 @@ onMounted(()=>{
     </el-row>
     <el-row v-if="workspace != ''">
       <el-col :span="5">
-        <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected" :msg="true"></WorkspaceFolder>
+        <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected"  :msg="true"></WorkspaceFolder>
       </el-col>
       <el-col :span="19">
         <RequestContainer @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item"></RequestContainer>

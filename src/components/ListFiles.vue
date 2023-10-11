@@ -8,7 +8,7 @@ import { ElTreeV2, ElPopconfirm, ElPopover } from 'element-plus'
 import type { TreeNode } from 'element-plus/es/components/tree-v2/src/types'
 //Properties
 const props = defineProps<{ items: any }>();
-const emit = defineEmits(["onFileSelect", "onFolderSelect"]);
+const emit = defineEmits(["onFileSelect", "onFolderSelect","onCreateRequest","onCreateFolder","onDeleteFileOrDirectory"]);
 
 //Interfaces
 //
@@ -75,16 +75,22 @@ const checkChange = (event) => {
 // Click handlers
 //
 const deleteSelectedFileFolder = ()=>{
-  console.log("Deleting",selectedFolder.value,selectedFile.value)
+  console.log("Deleting",treeRef.value?.getCurrentKey())
+  emit("onDeleteFileOrDirectory",treeRef.value?.getCurrentKey())
 }
 
 const createFolder = () => {
   
   console.log("Creating folder in ",treeRef.value?.getCurrentKey())
+  emit("onCreateFolder",treeRef.value?.getCurrentKey(),newFolderName.value)
+  newFolderVisible.value = !newFolderVisible.value;
 }
 
 const createRequest = () => {
-  console.log("Creating request in ",selectedFolder.value)
+
+  console.log("Creating request in ",treeRef.value?.getCurrentKey())
+  emit("onCreateRequest",treeRef.value?.getCurrentKey(),newRequestName.value)
+  newRequestVisible.value = false
 }
 
 const showNewFolderPopover = () => {
@@ -96,8 +102,8 @@ const showNewFolderPopover = () => {
 //Utility function
 //
 const getDeleteConfirmTitle = () => {
-  console.log(selectedFile.value)
-  let file = selectedFile.value == undefined ? selectedFolder.value?.id : selectedFile.value?.id
+  console.log(treeRef.value?.getCurrentKey())
+  let file = treeRef.value?.getCurrentKey()
   return `Are you sure to delete ${file} ?`;
 }
 
