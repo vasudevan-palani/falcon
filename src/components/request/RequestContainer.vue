@@ -18,7 +18,7 @@ import {NameValueEnabled} from '../common/model'
 
 //Properties
 const props = defineProps<{item:any}>();
-const emit = defineEmits(['onSendRequest']);
+const emit = defineEmits(['onSendRequest','onSaveRequest']);
 
 // Variables
 //
@@ -62,7 +62,14 @@ const sendRequest = () =>{
 }
 
 const saveRequest = () => {
-
+  emit('onSaveRequest',{
+    requestName : requestName.value, 
+    body : requestBody.value,
+    headers:headers.value,
+    params:params.value,
+    url:httpurl.value,
+    httpmethod:httpmethod.value
+  })
 }
 
 onMounted(()=>{

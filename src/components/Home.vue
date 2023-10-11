@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import RequestContainer from './request/RequestContainer.vue';
 import ResponseContainer from './response/ResponseContainer.vue';
 import WorkspaceFolder from './WorkspaceFolder.vue';
@@ -14,6 +14,7 @@ import Environment from './settings/Environment.vue'
 import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
 import { EnvironmentService } from '../services/EnvironmentService'
+import { RequestService } from "../services/RequestService";
 
 const mustache = require('mustache');
 
@@ -25,6 +26,7 @@ const emit = defineEmits([]);
 // Variables
 //
 const item = ref<any>()
+const requestFilePath = ref("")
 const workspace = ref("")
 const environment = ref("default")
 const environmentsFormVisible = ref(false)
@@ -57,13 +59,25 @@ ipcRenderer.on('selected-folder', function (event, path) {
 
 const onRequestSelected = (itemSelected: any) => {
   console.log("Home::requestSelected", itemSelected)
+
   readFileContent(itemSelected?.id, (err: any, data: any) => {
     if (err) {
 
     }
     else {
+      requestFilePath.value = itemSelected?.id;
       item.value = JSON.parse(data)
     }
+  })
+
+
+}
+
+const onSaveRequest = (request:any) => {
+  RequestService.save(requestFilePath.value,request).then((data:any)=>{
+    NotificationService.showMessage("Request saved.")
+  }).catch((err:any)=>{
+    NotificationService.showMessage("Failed to save request. "+err)
   })
 }
 
@@ -158,6 +172,12 @@ const chooseWorkspace = () => {
   ipcRenderer.send('open-file-dialog')
 }
 
+onMounted(()=>{
+  ProfileService.get().then((data:any)=>{
+    workspace.value = data.workspace;
+  })
+})
+
 
 
 </script>
@@ -195,7 +215,7 @@ const chooseWorkspace = () => {
         <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected" :msg="true"></WorkspaceFolder>
       </el-col>
       <el-col :span="19">
-        <RequestContainer @on-send-request="onSendRequest" :item="item"></RequestContainer>
+        <RequestContainer @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item"></RequestContainer>
         <ResponseContainer :item="item"></ResponseContainer>
       </el-col>
     </el-row>
