@@ -62,7 +62,7 @@ const onRequestSelected = (itemSelected: any) => {
 
   readFileContent(itemSelected?.id, (err: any, data: any) => {
     if (err) {
-
+      console.log(err)
     }
     else {
       requestFilePath.value = itemSelected?.id;
