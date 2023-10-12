@@ -192,7 +192,7 @@ watchEffect(() => {
   </el-row>
   <el-col :span="24" v-if="fileList.length > 0">
     <el-tree-v2 class="collection-list" ref="treeRef" :filter-method="filterMethod" @node-click="itemSelected"
-      @current-change="checkChange" :data="fileList" :props="treeprops" :height="208" />
+      @current-change="checkChange" :data="fileList" :props="treeprops" :height="700" />
   </el-col>
 </template>
 
@@ -202,7 +202,7 @@ watchEffect(() => {
   border: #EEE 1px solid;
   border-radius: 5px;
   margin: 10px;
-  height: 836px;
+  height: 796px;
 }
 .margin-bottom-10{
   margin-bottom: 10px;

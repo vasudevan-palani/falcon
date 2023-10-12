@@ -15,6 +15,7 @@ import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
 import { EnvironmentService } from '../services/EnvironmentService'
 import { RequestService } from "../services/RequestService";
+import { ImportService } from "../services/ImportService";
 
 const mustache = require('mustache');
 
@@ -52,6 +53,18 @@ ipcRenderer.on('selected-folder', function (event, path) {
     NotificationService.showMessage("Profile Saved.")
   }).catch((err: any) => {
     NotificationService.showMessage("UNable to save Profile.")
+  })
+
+});
+
+ipcRenderer.on('selected-import-file', function (event, path) {
+  //do what you want with the path/file selected, for example:
+  console.log(path)
+  ImportService.import(workspace.value,path).then((data)=>{
+    NotificationService.showMessage("Succesfully imported")
+    refreshWorkspace()
+  }).catch((err:any)=>{
+    NotificationService.showMessage("Error while importing , "+err)
   })
 
 });
@@ -179,6 +192,10 @@ const refreshWorkspace = () => {
   
 }
 
+const importCollection = () => {
+  ipcRenderer.send('open-import-dialog')
+}
+
 const chooseWorkspace = () => {
   ipcRenderer.send('open-file-dialog')
 }
@@ -203,7 +220,7 @@ onMounted(()=>{
     </el-row>
     <el-row class="settings-row" v-if="workspace != ''">
       <el-col :span="5">
-        <el-button class="import-button" :icon="DownloadIcon">Import</el-button>
+        <el-button class="import-button" @click="importCollection" :icon="DownloadIcon">Import</el-button>
         <el-button class="export-button" :icon="ExternalLinkIcon">Export</el-button>
       </el-col>
 
@@ -215,10 +232,10 @@ onMounted(()=>{
 
       <el-col :span="6" class="environment-col">
         <el-link @click="environmentsFormVisible = true" type="primary">Environment:&nbsp;</el-link>
-        <el-select v-model="environment" class="m-2" placeholder="Select" size="default">
+        <el-select class="settings-button" v-model="environment" placeholder="Select" size="default">
           <el-option v-for="item in environments" :key="item.label" :label="item.label" :value="item.value" />
         </el-select>
-        <el-button class="settings-button" :icon="SettingsIcon">Settings</el-button>
+        <!--el-button class="settings-button" :icon="SettingsIcon">Settings</el-button-->
       </el-col>
 
     </el-row>

@@ -98,6 +98,7 @@ watchEffect(() => {
     requestName.value = props.item.requestName;
     params.value = props.item.params;
     headers.value = props.item.headers;
+    requestBody.value = ""
     if ( props.item.body != undefined && props.item.body != ''){
         requestBody.value = JSON.stringify(JSON.parse(props.item.body), null, 4);
     }

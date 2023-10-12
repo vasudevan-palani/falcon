@@ -100,6 +100,16 @@ app.whenReady().then(()=>{
     })
   })
 
+  ipcMain.on('open-import-dialog', function (event) {
+    dialog.showOpenDialog(win,{
+      properties: ['openFile']
+    }).then((result)=>{
+      let filepaths = result.filePaths
+      console.log(result)
+      event.sender.send('selected-import-file', filepaths[0])
+    })
+  })
+
   ipcMain.on('dblclick-navbar', () => {
     if(win.isMaximized())
     {

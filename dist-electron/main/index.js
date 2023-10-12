@@ -66,6 +66,15 @@ electron.app.whenReady().then(() => {
       event.sender.send("selected-folder", filepaths);
     });
   });
+  electron.ipcMain.on("open-import-dialog", function(event) {
+    electron.dialog.showOpenDialog(win, {
+      properties: ["openFile"]
+    }).then((result) => {
+      let filepaths = result.filePaths;
+      console.log(result);
+      event.sender.send("selected-import-file", filepaths[0]);
+    });
+  });
   electron.ipcMain.on("dblclick-navbar", () => {
     if (win.isMaximized()) {
       win.unmaximize();
