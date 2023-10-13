@@ -7,6 +7,7 @@ import { SendIcon, SaveIcon, Trash2Icon, PlusIcon } from "@vue-icons/feather";
 // Ace editor
 import { VAceEditor } from "vue3-ace-editor";
 import "ace-builds/src-noconflict/mode-json";
+import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/theme-chrome";
 import workerJsonUrl from "ace-builds/src-noconflict/worker-json?url"; // For vite
 import ace from "ace-builds";
@@ -29,6 +30,7 @@ const httpurl = ref("")
 const requestBody = ref("")
 const params = ref<NameValueEnabled[]>([])
 const headers = ref<NameValueEnabled[]>([])
+const requestScript = ref("")
 
 //Global variables
 //
@@ -50,6 +52,10 @@ const onRequestBodyChange = (content:any) => {
     console.log(content)
 }
 
+const onRequestScriptChange = (script:any) =>{
+  console.log(script)
+}
+
 // Click handlers
 //
 const handleTabClick = ()=>{
@@ -58,7 +64,7 @@ const handleTabClick = ()=>{
 
 const sendRequest = () =>{
     console.log("request",headers.value,params.value,requestBody.value,httpurl.value,httpmethod.value)
-    emit('onSendRequest',{body : requestBody.value,headers:headers.value,params:params.value,httpurl:httpurl.value,httpmethod:httpmethod.value})
+    emit('onSendRequest',{body : requestBody.value,headers:headers.value,params:params.value,httpurl:httpurl.value,httpmethod:httpmethod.value,script:requestScript.value})
 }
 
 const saveRequest = () => {
@@ -68,7 +74,8 @@ const saveRequest = () => {
     headers:headers.value,
     params:params.value,
     url:httpurl.value,
-    httpmethod:httpmethod.value
+    httpmethod:httpmethod.value,
+    script:requestScript.value
   })
 }
 
@@ -101,6 +108,10 @@ watchEffect(() => {
     requestBody.value = ""
     if ( props.item.body != undefined && props.item.body != ''){
         requestBody.value = JSON.stringify(JSON.parse(props.item.body), null, 4);
+    }
+    requestScript.value = ""
+    if ( props.item.script != undefined && props.item.script != ''){
+      requestScript.value = props.item.script
     }
     
 });
@@ -221,13 +232,13 @@ watchEffect(() => {
                 </el-col>
               </el-row>
             </el-tab-pane>
-            <el-tab-pane label="Authorization" name="auth">
+            <!-- <el-tab-pane label="Authorization" name="auth">
               <el-row class="form-row">
                 <div class="ml-3 w-35 text-gray-600 inline-flex items-center">
                   Params
                 </div>
               </el-row>
-            </el-tab-pane>
+            </el-tab-pane> -->
             <el-tab-pane label="Body" name="body">
               <el-row class="form-row">
                     <el-col>
@@ -235,6 +246,19 @@ watchEffect(() => {
                         v-model:value="requestBody"
                         @update:value="onRequestBodyChange"
                         lang="json"
+                        :options="{ useWorker: true, showGutter:false, highlightActiveLine:false, showPrintMargin:false }"
+                        style="height: 300px"
+                        />
+                    </el-col>
+              </el-row>
+            </el-tab-pane>
+            <el-tab-pane label="Script" name="script">
+              <el-row class="form-row">
+                    <el-col>
+                    <v-ace-editor
+                        v-model:value="requestScript"
+                        @update:value="onRequestScriptChange"
+                        lang="javascript"
                         :options="{ useWorker: true, showGutter:false, highlightActiveLine:false, showPrintMargin:false }"
                         style="height: 300px"
                         />

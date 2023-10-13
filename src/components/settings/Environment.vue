@@ -7,15 +7,17 @@ import { SaveIcon, Trash2Icon, PlusIcon } from "@vue-icons/feather";
 import {EnvironmentService} from '../../services/EnvironmentService';
 import {NotificationService} from '../../services/NotificationService';
 
+import {Environment} from '../../models/Environment';
+
 //Properties
 const props = defineProps<{}>();
 const emit = defineEmits(["onSave"]);
 
 // Variables
 //
-const environments = ref<any[]>([])
+const environments = ref<Environment[]>([])
 const activeName = ref("default")
-const newEnv = ref("")
+const newEnv = ref<string>("")
 
 //Global variables
 //
@@ -28,7 +30,7 @@ const handleTabClick = () => {
 
 // Click handlers
 //
-const addEnvironmentParam = (env: string) => {
+const addEnvironmentParam = (env: Environment) => {
     env.params.push({
         "name": "",
         "value": "",
@@ -38,12 +40,13 @@ const addEnvironmentParam = (env: string) => {
 
 const saveEnvironments = () => {
     console.log(environments.value)
-    EnvironmentService.updateAll(environments.value).then((data)=>{
-        NotificationService.showMessage("Environments Saved.");
+    try{
+        EnvironmentService.updateAll(environments.value);
         emit('onSave')
-    }).catch((err)=>{
+        NotificationService.showMessage("Environments Saved.");
+    }catch(err){
         NotificationService.showMessage("Unable to save." + err);
-    })
+    }
     
 }
 
@@ -61,24 +64,25 @@ const addEnvironment = ()=>{
 //
 
 
-
-
-
 onMounted(() => {
-    EnvironmentService.getAll().then(data=>{
-        console.log("read environemnts",data)
-        environments.value = data
-    }).catch(err=>{
-        environments.value = [{
-            "name":"default",
-            "label" : "default",
-            "params" : []
-        }]
-    })
+    try{
+        environments.value = EnvironmentService.getAll()
+    }
+    catch(err){
+        console.log(err)
+        NotificationService.showMessage("Unable to load environments")
+    }
 })
 
 watchEffect(() => {
-    console.log(environments.value)
+    try{
+        environments.value = EnvironmentService.getAll()
+    }
+    catch(err){
+        console.log(err)
+        NotificationService.showMessage("Unable to load environments")
+    }
+    
 })
 </script>
 
