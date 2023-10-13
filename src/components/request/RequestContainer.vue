@@ -36,12 +36,20 @@ const requestScript = ref("")
 //
 const httpmethods = [
     {
-        "value" : "get",
+        "value" : "GET",
         "label" : "GET"
     },
     {
-        "value" : "post",
+        "value" : "POST",
         "label" : "POST"
+    },
+    {
+        "value" : "PUT",
+        "label" : "PUT"
+    },
+    {
+        "value" : "OPTIONS",
+        "label" : "OPTIONS"
     }
 ]
 

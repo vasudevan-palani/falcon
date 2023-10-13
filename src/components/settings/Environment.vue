@@ -2,15 +2,15 @@
 
 // Imports
 //
-import { reactive, ref, watchEffect, onMounted } from "vue";
+import { reactive, ref, watchEffect, onMounted, onUpdated } from "vue";
 import { SaveIcon, Trash2Icon, PlusIcon } from "@vue-icons/feather";
-import {EnvironmentService} from '../../services/EnvironmentService';
-import {NotificationService} from '../../services/NotificationService';
+import { EnvironmentService } from '../../services/EnvironmentService';
+import { NotificationService } from '../../services/NotificationService';
 
-import {Environment} from '../../models/Environment';
+import { Environment } from '../../models/Environment';
 
 //Properties
-const props = defineProps<{}>();
+const props = defineProps<{ refresh: any }>();
 const emit = defineEmits(["onSave"]);
 
 // Variables
@@ -40,22 +40,22 @@ const addEnvironmentParam = (env: Environment) => {
 
 const saveEnvironments = () => {
     console.log(environments.value)
-    try{
+    try {
         EnvironmentService.updateAll(environments.value);
         emit('onSave')
         NotificationService.showMessage("Environments Saved.");
-    }catch(err){
+    } catch (err) {
         NotificationService.showMessage("Unable to save." + err);
     }
-    
+
 }
 
-const addEnvironment = ()=>{
-    if (newEnv.value){
+const addEnvironment = () => {
+    if (newEnv.value) {
         environments.value.push({
-            "name":newEnv.value,
-            "label":newEnv.value,
-            "params" : []
+            "name": newEnv.value,
+            "label": newEnv.value,
+            "params": []
         })
     }
 }
@@ -63,39 +63,62 @@ const addEnvironment = ()=>{
 //Utility function
 //
 
+try {
+    environments.value = EnvironmentService.getAll()
+}
+catch (err) {
+    console.log(err)
+    NotificationService.showMessage("Unable to load environments")
+}
 
-onMounted(() => {
-    try{
+onUpdated(() => {
+    console.log("onUpdated")
+    try {
         environments.value = EnvironmentService.getAll()
     }
-    catch(err){
+    catch (err) {
+        console.log(err)
+        NotificationService.showMessage("Unable to load environments")
+    }
+})
+
+
+onMounted(() => {
+    console.log("onMounted")
+    try {
+        environments.value = EnvironmentService.getAll()
+    }
+    catch (err) {
         console.log(err)
         NotificationService.showMessage("Unable to load environments")
     }
 })
 
 watchEffect(() => {
-    try{
+    console.log(props.refresh)
+    try {
         environments.value = EnvironmentService.getAll()
     }
-    catch(err){
+    catch (err) {
         console.log(err)
         NotificationService.showMessage("Unable to load environments")
     }
-    
+
+
 })
 </script>
 
 <template>
     <el-row>
         <el-col :span="7"></el-col>
-       <el-col :span="5">
+        <el-col :span="5">
             <el-input v-model="newEnv" placeholder="Name"></el-input>
         </el-col>
         <el-col :span="5">
-            <el-button type="primary" :icon="PlusIcon" @click="addEnvironment" :enabled="newEnv != undefined">New Environment</el-button>
-       </el-col> 
-       <el-col :span="7"></el-col>
+            <el-button type="primary" :icon="PlusIcon" @click="addEnvironment" :enabled="newEnv != undefined">New
+                Environment</el-button>
+        </el-col>
+        <el-col :span="7"></el-col>
     </el-row>
     <el-row>
         <el-col :span="24">
@@ -145,8 +168,9 @@ watchEffect(() => {
 .actions-row {
     margin-bottom: 10px;
 }
-.save-btn-col{
-    margin-top:40px;
-    text-align:start;
+
+.save-btn-col {
+    margin-top: 40px;
+    text-align: start;
 }
 </style>

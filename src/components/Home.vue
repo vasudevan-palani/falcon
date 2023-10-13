@@ -155,7 +155,7 @@ const onSendRequest = (requestTemplate: any) => {
     headers: headers
   }
 
-  if (request.httpmethod == "post") {
+  if (request.httpmethod == "POST") {
     options.body = request.body;
   }
 
@@ -194,6 +194,7 @@ const onSendRequest = (requestTemplate: any) => {
       vm.runInContext(request.script, context);
 
       console.log(context.envdata)
+      environments.value = EnvironmentService.getAll()
 
     })
 
@@ -281,7 +282,7 @@ onMounted(() => {
     </el-row>
 
     <el-dialog v-model="environmentsFormVisible" title="Environments" width="80%" draggable>
-      <Environment @on-save="onEnvChange"></Environment>
+      <Environment :refresh="environments" @on-save="onEnvChange" ></Environment>
     </el-dialog>
 
   </div>
