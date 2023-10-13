@@ -18,7 +18,7 @@
       "dmg"
     ],
     "artifactName": "${productName}-Mac-${version}-Installer.${ext}",
-    "icon" : "./dist/favicon.png"
+    "icon" : "./dist/favicon.ico"
   },
   "win": {
     "target": [

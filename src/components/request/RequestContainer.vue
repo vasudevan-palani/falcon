@@ -78,6 +78,22 @@ const handleTabClick = ()=>{
 
 }
 
+const addParam = () => {
+  params.value.push({
+    "name" : "",
+    "value" : "",
+    "enabled" : true
+  })
+}
+
+const addHeader = () => {
+  headers.value.push({
+    "name" : "",
+    "value" : "",
+    "enabled" : true
+  })
+}
+
 const sendRequest = () =>{
     console.log("request",headers.value,params.value,requestBody.value,httpurl.value,httpmethod.value)
     emit('onSendRequest',{body : requestBody.value,headers:headers.value,params:params.value,httpurl:httpurl.value,httpmethod:httpmethod.value,script:requestScript.value})
@@ -176,7 +192,7 @@ watchEffect(() => {
           >
             <el-tab-pane label="Params" name="params">
                 <el-row class="actions-row">
-                    <el-button :icon="PlusIcon">Add</el-button>
+                    <el-button :icon="PlusIcon" @click="addParam">Add</el-button>
                 </el-row>
 
               <el-row class="form-row" v-for="param in params">
@@ -207,7 +223,7 @@ watchEffect(() => {
             </el-tab-pane>
             <el-tab-pane label="Headers" name="headers">
                 <el-row class="actions-row">
-                    <el-button :icon="PlusIcon">Add</el-button>
+                    <el-button :icon="PlusIcon" @click="addHeader">Add</el-button>
                 </el-row>
                 <el-row class="form-row" v-for="header in headers">
                 <el-col :span="11" >

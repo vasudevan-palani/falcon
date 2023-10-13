@@ -87,15 +87,15 @@ const deleteSelectedFileFolder = () => {
 
 const createFolder = () => {
 
-  console.log("Creating folder in ", treeRef.value?.getCurrentKey())
-  emit("onCreateFolder", treeRef.value?.getCurrentKey(), newFolderName.value)
+  console.log("Creating folder in ", getCurrentFileOrDir())
+  emit("onCreateFolder", getCurrentFileOrDir(), newFolderName.value)
   newFolderVisible.value = !newFolderVisible.value;
 }
 
 const createRequest = () => {
 
-  console.log("Creating request in ", treeRef.value?.getCurrentKey())
-  emit("onCreateRequest", treeRef.value?.getCurrentKey(), newRequestName.value)
+  console.log("Creating request in ", getCurrentFileOrDir())
+  emit("onCreateRequest", getCurrentFileOrDir(), newRequestName.value)
   newRequestVisible.value = false
 }
 
