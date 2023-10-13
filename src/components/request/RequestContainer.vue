@@ -50,6 +50,14 @@ const httpmethods = [
     {
         "value" : "OPTIONS",
         "label" : "OPTIONS"
+    },
+    {
+        "value" : "PATCH",
+        "label" : "PATCH"
+    },
+    {
+        "value" : "DELETE",
+        "label" : "DELETE"
     }
 ]
 

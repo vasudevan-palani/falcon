@@ -155,17 +155,19 @@ const onSendRequest = (requestTemplate: any) => {
     headers: headers
   }
 
-  if (request.httpmethod == "POST") {
+  if (["POST","PUT","PATCH","DELETE","OPTIONS"].includes(request.httpmethod)) {
     options.body = request.body;
   }
 
   console.log(headers)
+  let starttime = Date.now()
   fetch(url, options).then((response: any) => {
     console.log(response, response.status, response.statusText)
 
+    
 
-    response.json().then((data: any) => {
-
+    response.text().then((data: any) => {
+      let endtime = Date.now()
       let responseHeaders: NameValueEnabled[] = []
       response.headers.forEach((value: any, key: any) => {
         responseHeaders.push({
@@ -179,19 +181,28 @@ const onSendRequest = (requestTemplate: any) => {
         "status": response.status,
         "statusText": response.statusText,
         "headers": responseHeaders,
-        "responseJson": data
+        "responseText": data,
+        "latency" : endtime-starttime
       }
 
       let context: any = {
         "JSON": JSON,
         "envdata": envdata,
-        "responseBody": item.value.response,
+        "request": item.value.request,
+        "response": item.value.response,
         "falcon": new FalconService(environment.value, envdata)
       }
 
       vm.createContext(context);
       console.log(request.script)
-      vm.runInContext(request.script, context);
+      try{
+        vm.runInContext(request.script, context);
+      }
+      catch(err){
+        console.log(err)
+        NotificationService.showMessage(String(err))
+      }
+      
 
       console.log(context.envdata)
       environments.value = EnvironmentService.getAll()

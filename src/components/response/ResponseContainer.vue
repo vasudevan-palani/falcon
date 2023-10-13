@@ -27,6 +27,8 @@ const responseBody = ref('{"name":"vsdff"}');
 const responseHeaders = ref<NameValueEnabled[]>()
 const responseStatus = ref<number>()
 const responseStatusText = ref<string>()
+const latency = ref()
+const lang = ref<string>("")
 
 //Global variables
 //
@@ -42,6 +44,15 @@ const onResponseBodyChange = () => { };
 
 //Utility function
 //
+
+const getFormattedLatency = (latency) => {
+  if(latency>1000){
+    return `${latency/1000}s`
+  }
+  else{
+    return `${latency}ms`
+  }
+}
 
 onMounted(() => {
   if (props.item?.response != undefined) {
@@ -59,7 +70,26 @@ watchEffect(() => {
     responseHeaders.value = props.item.response.headers
     responseStatus.value = props.item.response.status
     responseStatusText.value = props.item.response.statusText
-    responseBody.value = JSON.stringify(props.item.response?.responseJson, null, 4)
+    latency.value = props.item.response.latency
+
+    let contentType = "application/text"
+
+    if(responseHeaders.value?.length > 0){
+      for(let i=0;i<responseHeaders.value?.length;i++){
+        let header = responseHeaders.value[i]
+        if (header.name == "content-type"){
+          contentType = header.value
+        }
+      }
+    }
+
+    if(contentType.includes("application/json")){
+      responseBody.value = JSON.stringify(JSON.parse(props.item.response?.responseText), null, 4)
+    }
+    else{
+      responseBody.value = props.item.response?.responseText
+    }
+    
   }
 });
 </script>
@@ -72,6 +102,7 @@ watchEffect(() => {
           <el-text> Response </el-text>
         </el-col>
         <el-col :span="6" class="status-col" v-if="responseStatus !=undefined">
+          <el-text> Time : {{ getFormattedLatency(latency) }} | </el-text>
           <el-text> Status : {{ responseStatus }} ({{ responseStatusText }}) </el-text>
         </el-col>
       </el-row>
