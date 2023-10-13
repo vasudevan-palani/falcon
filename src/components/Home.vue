@@ -14,6 +14,7 @@ import Environment from './settings/Environment.vue'
 import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
 import { EnvironmentService } from '../services/EnvironmentService'
+import ImportCollection from './settings/ImportCollection.vue'
 import { RequestService } from "../services/RequestService";
 import { ImportService } from "../services/ImportService";
 import { FalconService } from "../services/FalconService";
@@ -38,7 +39,8 @@ const requestFilePath = ref("")
 const workspace = ref("")
 const environment = ref("default")
 const environmentsFormVisible = ref(false)
-const environments = ref("")
+const environments = ref<any>()
+const importFormVisible = ref(false)
 
 //Global variables
 //
@@ -57,18 +59,6 @@ ipcRenderer.on('selected-folder', function (event, path) {
   } catch (err) {
     NotificationService.showMessage("UNable to save Profile.")
   }
-});
-
-ipcRenderer.on('selected-import-file', function (event, path) {
-  //do what you want with the path/file selected, for example:
-  console.log(path)
-  ImportService.import(workspace.value, path).then((data) => {
-    NotificationService.showMessage("Succesfully imported")
-    refreshWorkspace()
-  }).catch((err: any) => {
-    NotificationService.showMessage("Error while importing , " + err)
-  })
-
 });
 
 
@@ -108,6 +98,14 @@ const onEnvChange = () => {
 
 }
 
+const exportCollection = () => {
+  NotificationService.showMessage("Will be implemented in near future.")
+}
+
+const onImportComplete = () => {
+  importFormVisible.value = false;
+  refreshWorkspace();
+}
 
 
 const onSendRequest = (requestTemplate: any) => {
@@ -118,7 +116,7 @@ const onSendRequest = (requestTemplate: any) => {
     NotificationService.showMessage("Unable to find the environment")
   }
 
-  let envdata : EnvironmentParam[] = env?.params
+  let envdata : EnvironmentParam[]|undefined = env?.params
 
   console.log(requestTemplate, envdata)
   const requestString = mustache.render(JSON.stringify(requestTemplate), envdata);
@@ -262,8 +260,8 @@ onMounted(() => {
     </el-row>
     <el-row class="settings-row" v-if="workspace != ''">
       <el-col :span="5">
-        <el-button class="import-button" @click="importCollection" :icon="DownloadIcon">Import</el-button>
-        <el-button class="export-button" :icon="ExternalLinkIcon">Export</el-button>
+        <el-button class="import-button" @click="importFormVisible = true" :icon="DownloadIcon">Import</el-button>
+        <el-button class="export-button" @click="exportCollection" :icon="ExternalLinkIcon">Export</el-button>
       </el-col>
 
       <el-col :span="13" class="middle-menu">
@@ -294,6 +292,10 @@ onMounted(() => {
 
     <el-dialog v-model="environmentsFormVisible" title="Environments" width="80%" draggable>
       <Environment :refresh="environments" @on-save="onEnvChange" ></Environment>
+    </el-dialog>
+
+    <el-dialog v-model="importFormVisible" title="Import Collection" width="50%" draggable>
+      <ImportCollection :directory="workspace" @on-import-complete="onImportComplete"></ImportCollection>
     </el-dialog>
 
   </div>

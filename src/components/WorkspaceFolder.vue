@@ -40,12 +40,13 @@ const onFileSelect = (item: any) => {
 const onCreateRequest = (dirPath: string, requestName: string) => {
   let directoryPath = dirPath == undefined ? workspaceDirectory.value : dirPath
   console.log("onCreateRequest", dirPath, requestName)
-  RequestService.add(directoryPath, requestName).then((data: any) => {
+  try {
+    RequestService.add(directoryPath, requestName)
     NotificationService.showMessage("Request added.")
     scanWorkspace(workspaceDirectory.value)
-  }).catch((err: any) => {
+  } catch (err: any) {
     NotificationService.showMessage("Failed to add request. " + err)
-  })
+  }
 }
 
 const onCreateFolder = (dirPath: string, newDirectoryName: string) => {
@@ -131,7 +132,7 @@ watchEffect(() => {
   <el-row v-if="workspaceDirectory != ''" class="workspace-folder-row">
 
   </el-row>
-  <ListFiles :items="items" @on-file-select="onFileSelect" @on-create-request="onCreateRequest"
+  <ListFiles :workspace-dir="workspaceDirectory" :items="items" @on-file-select="onFileSelect" @on-create-request="onCreateRequest"
     @on-create-folder="onCreateFolder" @on-delete-file-or-directory="onDeleteFileOrDirectory"></ListFiles>
 </template>
 

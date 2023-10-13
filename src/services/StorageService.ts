@@ -18,4 +18,13 @@ export class StorageService {
             return false; // The file does not exist or there was an error
         }
     }
+
+    static isDirectory(path: string) {
+        try {
+            const stats = fs.statSync(path);
+            return stats.isDirectory();
+        } catch (error) {
+            return false;
+        }
+    }
 }

@@ -5,10 +5,12 @@
 import { reactive, ref, watchEffect, onMounted } from "vue";
 import { SearchIcon, PlusIcon, Trash2Icon } from "@vue-icons/feather";
 import { ElTreeV2, ElPopconfirm, ElPopover } from 'element-plus'
-import type { TreeNode } from 'element-plus/es/components/tree-v2/src/types'
+import type { TreeNodeData, FilterMethod } from 'element-plus/es/components/tree-v2/src/types'
+
+import {StorageService} from '../services/StorageService'
 //Properties
-const props = defineProps<{ items: any }>();
-const emit = defineEmits(["onFileSelect", "onFolderSelect","onCreateRequest","onCreateFolder","onDeleteFileOrDirectory"]);
+const props = defineProps<{ items: any, workspaceDir: string }>();
+const emit = defineEmits(["onFileSelect", "onFolderSelect", "onCreateRequest", "onCreateFolder", "onDeleteFileOrDirectory"]);
 
 //Interfaces
 //
@@ -63,35 +65,49 @@ const onQueryChanged = (query: string) => {
   treeRef.value!.filter(query)
 }
 
-const filterMethod = (query: string, node: TreeNode) => {
+const filterMethod: FilterMethod = (query: string, node: TreeNodeData) => {
   return node.label!.includes(query)
 }
 
-const checkChange = (event) => {
-  console.log("checkchange",event)
+const getFilterMethod = () => {
+  return filterMethod
+}
+
+const checkChange = (event: any) => {
+  console.log("checkchange", event)
 }
 
 
 // Click handlers
 //
-const deleteSelectedFileFolder = ()=>{
-  console.log("Deleting",treeRef.value?.getCurrentKey())
-  emit("onDeleteFileOrDirectory",treeRef.value?.getCurrentKey())
+const deleteSelectedFileFolder = () => {
+  console.log("Deleting", treeRef.value?.getCurrentKey())
+  emit("onDeleteFileOrDirectory", treeRef.value?.getCurrentKey())
 }
 
 const createFolder = () => {
-  
-  console.log("Creating folder in ",treeRef.value?.getCurrentKey())
-  emit("onCreateFolder",treeRef.value?.getCurrentKey(),newFolderName.value)
+
+  console.log("Creating folder in ", treeRef.value?.getCurrentKey())
+  emit("onCreateFolder", treeRef.value?.getCurrentKey(), newFolderName.value)
   newFolderVisible.value = !newFolderVisible.value;
 }
 
 const createRequest = () => {
 
-  console.log("Creating request in ",treeRef.value?.getCurrentKey())
-  emit("onCreateRequest",treeRef.value?.getCurrentKey(),newRequestName.value)
+  console.log("Creating request in ", treeRef.value?.getCurrentKey())
+  emit("onCreateRequest", treeRef.value?.getCurrentKey(), newRequestName.value)
   newRequestVisible.value = false
 }
+
+const getCurrentFileOrDir = () => {
+  let currentDirectory = treeRef.value?.getCurrentKey()
+  if (currentDirectory == undefined || ! StorageService.isDirectory(String(currentDirectory))) {
+    currentDirectory = props.workspaceDir
+  }
+  
+  return currentDirectory
+}
+
 
 const showNewFolderPopover = () => {
   newFolderVisible.value = !newFolderVisible.value;
@@ -124,24 +140,27 @@ watchEffect(() => {
       :suffix-icon="SearchIcon" />
     <el-row class="file-actions-row">
       <el-col :span="8">
-        <el-popover :visible="newFolderVisible" placement="right" :width="300">
+        <el-popover :visible="newFolderVisible" placement="right" :width="500">
           <el-row class="margin-bottom-10">
             <el-col :span="24">
-            <el-text class="left-justify">Please enter the folder name</el-text>
-          </el-col>
-          </el-row>
-          
-          <el-row class="margin-bottom-10">
-            <el-col :span="24">
-            <el-input v-model="newFolderName"></el-input>
+              <el-text class="left-justify">Directory : {{ getCurrentFileOrDir() }}</el-text>
             </el-col>
           </el-row>
-          
+          <el-row class="margin-bottom-10">
+            <el-col :span="24">
+              <el-text class="left-justify">Please enter the folder name</el-text>
+            </el-col>
+          </el-row>
+
+          <el-row class="margin-bottom-10">
+            <el-col :span="24">
+              <el-input v-model="newFolderName"></el-input>
+            </el-col>
+          </el-row>
+
           <el-row class="margin-bottom-10">
             <el-col :span="12">
               <el-button type="danger" @click="newFolderVisible = false" plain>Cancel</el-button>
-            </el-col>
-            <el-col :span="12">
               <el-button type="primary" @click="createFolder" plain>Submit</el-button>
             </el-col>
           </el-row>
@@ -149,32 +168,36 @@ watchEffect(() => {
             <el-button type="primary" @click="showNewFolderPopover" plain :icon="PlusIcon">Folder</el-button>
           </template>
         </el-popover>
-        
+
       </el-col>
       <el-col :span="10">
-        <el-popover :visible="newRequestVisible" placement="right" :width="300">
+        <el-popover :visible="newRequestVisible" placement="right" :width="500">
           <el-row class="margin-bottom-10">
             <el-col :span="24">
-            <el-text class="left-justify">Please enter the request name</el-text>
-          </el-col>
-          </el-row>
-          
-          <el-row class="margin-bottom-10">
-            <el-col :span="24">
-            <el-input v-model="newRequestName"></el-input>
+              <el-text class="left-justify">Directory : {{ getCurrentFileOrDir() }}</el-text>
             </el-col>
           </el-row>
-          
+          <el-row class="margin-bottom-10">
+            <el-col :span="24">
+              <el-text class="left-justify">Please enter the request name</el-text>
+            </el-col>
+          </el-row>
+
+          <el-row class="margin-bottom-10">
+            <el-col :span="24">
+              <el-input v-model="newRequestName"></el-input>
+            </el-col>
+          </el-row>
+
           <el-row class="margin-bottom-10">
             <el-col :span="12">
               <el-button type="danger" @click="newRequestVisible = false" plain>Cancel</el-button>
-            </el-col>
-            <el-col :span="12">
               <el-button type="primary" @click="createRequest" plain>Submit</el-button>
             </el-col>
           </el-row>
           <template #reference>
-            <el-button type="primary" @click="newRequestVisible = !newRequestVisible" plain :icon="PlusIcon">Request</el-button>
+            <el-button type="primary" @click="newRequestVisible = !newRequestVisible" plain
+              :icon="PlusIcon">Request</el-button>
           </template>
         </el-popover>
 
@@ -191,7 +214,7 @@ watchEffect(() => {
     </el-row>
   </el-row>
   <el-col :span="24" v-if="fileList.length > 0">
-    <el-tree-v2 class="collection-list" ref="treeRef" :filter-method="filterMethod" @node-click="itemSelected"
+    <el-tree-v2 :filter-method="filterMethod" class="collection-list" ref="treeRef" @node-click="itemSelected"
       @current-change="checkChange" :data="fileList" :props="treeprops" :height="700" />
   </el-col>
 </template>
@@ -204,9 +227,11 @@ watchEffect(() => {
   margin: 10px;
   height: 796px;
 }
-.margin-bottom-10{
+
+.margin-bottom-10 {
   margin-bottom: 10px;
 }
+
 .searchfilter {
   margin: 10px;
 }
@@ -217,5 +242,4 @@ watchEffect(() => {
 
 .file-actions-row {
   margin-top: 10px;
-}
-</style>
+}</style>

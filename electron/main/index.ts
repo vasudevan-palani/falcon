@@ -46,7 +46,7 @@ async function createWindow() {
     titleBarStyle: 'hidden',
     width:1280,
     height:720,
-    icon: join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    icon: join(process.env.VITE_PUBLIC, 'dist/falconicon_512.icns'),
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production

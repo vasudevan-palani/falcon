@@ -27,7 +27,7 @@ const responseBody = ref('{"name":"vsdff"}');
 const responseHeaders = ref<NameValueEnabled[]>()
 const responseStatus = ref<number>()
 const responseStatusText = ref<string>()
-const latency = ref()
+const latency = ref<number>(0)
 const lang = ref<string>("")
 
 //Global variables
@@ -45,7 +45,7 @@ const onResponseBodyChange = () => { };
 //Utility function
 //
 
-const getFormattedLatency = (latency) => {
+const getFormattedLatency = (latency:number) => {
   if(latency>1000){
     return `${latency/1000}s`
   }
@@ -74,9 +74,11 @@ watchEffect(() => {
 
     let contentType = "application/text"
 
-    if(responseHeaders.value?.length > 0){
-      for(let i=0;i<responseHeaders.value?.length;i++){
-        let header = responseHeaders.value[i]
+    let headers : any[] = responseHeaders.value ? responseHeaders.value : []
+
+    if(headers.length > 0){
+      for(let i=0;i<headers.length;i++){
+        let header = headers[i]
         if (header.name == "content-type"){
           contentType = header.value
         }
