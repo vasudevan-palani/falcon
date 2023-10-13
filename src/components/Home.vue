@@ -22,7 +22,7 @@ import { FalconService } from "../services/FalconService";
 import { FalconProfile } from "../models/FalconProfile";
 import { Environment as EnvironmentModel, EnvironmentParam } from "../models/Environment";
 
-import {Request} from '../models/Request';
+import { Request } from '../models/Request';
 
 const mustache = require('mustache');
 const vm = require('node:vm');
@@ -64,9 +64,13 @@ ipcRenderer.on('selected-folder', function (event, path) {
 
 const onRequestSelected = (itemSelected: any) => {
   console.log("Home::requestSelected", itemSelected)
-  let request: Request = RequestService.get(itemSelected?.id)
-  requestFilePath.value = itemSelected?.id;
-  item.value = request
+  try {
+    let request: Request = RequestService.get(itemSelected?.id)
+    requestFilePath.value = itemSelected?.id;
+    item.value = request
+  } catch (err) {
+    NotificationService.showMessage(String(err))
+  }
 
 }
 
@@ -110,13 +114,13 @@ const onImportComplete = () => {
 
 const onSendRequest = (requestTemplate: any) => {
 
-  let env : EnvironmentModel|undefined = EnvironmentService.get(environment.value)
+  let env: EnvironmentModel | undefined = EnvironmentService.get(environment.value)
 
-  if(env == undefined){
+  if (env == undefined) {
     NotificationService.showMessage("Unable to find the environment")
   }
 
-  let envdata : EnvironmentParam[]|undefined = env?.params
+  let envdata: EnvironmentParam[] | undefined = env?.params
 
   console.log(requestTemplate, envdata)
   const requestString = mustache.render(JSON.stringify(requestTemplate), envdata);
@@ -153,7 +157,7 @@ const onSendRequest = (requestTemplate: any) => {
     headers: headers
   }
 
-  if (["POST","PUT","PATCH","DELETE","OPTIONS"].includes(request.httpmethod)) {
+  if (["POST", "PUT", "PATCH", "DELETE", "OPTIONS"].includes(request.httpmethod)) {
     options.body = request.body;
   }
 
@@ -162,7 +166,7 @@ const onSendRequest = (requestTemplate: any) => {
   fetch(url, options).then((response: any) => {
     console.log(response, response.status, response.statusText)
 
-    
+
 
     response.text().then((data: any) => {
       let endtime = Date.now()
@@ -180,7 +184,7 @@ const onSendRequest = (requestTemplate: any) => {
         "statusText": response.statusText,
         "headers": responseHeaders,
         "responseText": data,
-        "latency" : endtime-starttime
+        "latency": endtime - starttime
       }
 
       let context: any = {
@@ -193,14 +197,14 @@ const onSendRequest = (requestTemplate: any) => {
 
       vm.createContext(context);
       console.log(request.script)
-      try{
+      try {
         vm.runInContext(request.script, context);
       }
-      catch(err){
+      catch (err) {
         console.log(err)
         NotificationService.showMessage(String(err))
       }
-      
+
 
       console.log(context.envdata)
       environments.value = EnvironmentService.getAll()
@@ -291,7 +295,7 @@ onMounted(() => {
     </el-row>
 
     <el-dialog v-model="environmentsFormVisible" title="Environments" width="80%" draggable>
-      <Environment :refresh="environments" @on-save="onEnvChange" ></Environment>
+      <Environment :refresh="environments" @on-save="onEnvChange"></Environment>
     </el-dialog>
 
     <el-dialog v-model="importFormVisible" title="Import Collection" width="50%" draggable>

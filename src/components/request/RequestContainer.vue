@@ -95,19 +95,6 @@ const saveRequest = () => {
   })
 }
 
-onMounted(()=>{
-    // console.log("in req container",props.item)
-    // if (props.item == undefined){
-    //     return
-    // }
-    // httpurl.value = props.item.url;
-    // httpmethod.value = props.item.httpmethod;
-    // requestName.value = props.item.requestName;
-    // params.value = props.item.params;
-    // headers.value = props.item.headers;
-    // requestBody.value = JSON.stringify(JSON.parse(props.item.body), null, 4);
-})
-
 //Utility function
 //
 

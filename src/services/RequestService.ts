@@ -8,13 +8,23 @@ import {Request} from "../models/Request"
 export class RequestService{
     static get(filePath:string){
         let data = StorageService.getSync(filePath)
-        return JSON.parse(data)
+        let dataJson =  JSON.parse(data)
+
+        return new Request(
+            dataJson.requestName,
+            dataJson.body,
+            dataJson.headers,
+            dataJson.params,
+            dataJson.url,
+            dataJson.httpmethod,
+            dataJson.script
+        )
     }
     static save(filePath:string,data:Request){
         StorageService.writeSync(filePath,JSON.stringify(data))
     }
     static add(filePath:string,filename:string){
-        let request = new Request("New Request","",[],[],"","")
+        let request = new Request("New Request","",[],[],"","","")
         StorageService.writeSync(`${filePath}/${filename}.json`,JSON.stringify(request))
         return request
     }
