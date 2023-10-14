@@ -2,7 +2,7 @@
 // Imports
 //
 import { reactive, ref, watchEffect, onMounted } from "vue";
-import { SendIcon, SaveIcon, Trash2Icon, PlusIcon } from "@vue-icons/feather";
+import { ChevronsRightIcon, SaveIcon, Trash2Icon, PlusIcon } from "@vue-icons/feather";
 
 // Ace editor
 import { VAceEditor } from "vue3-ace-editor";
@@ -18,7 +18,7 @@ ace.config.setModuleUrl("ace/mode/json_worker", workerJsonUrl);
 import {NameValueEnabled} from '../common/model'
 
 //Properties
-const props = defineProps<{item:any}>();
+const props = defineProps<{item:any,sendloading:boolean}>();
 const emit = defineEmits(['onSendRequest','onSaveRequest']);
 
 // Variables
@@ -92,6 +92,14 @@ const addHeader = () => {
     "value" : "",
     "enabled" : true
   })
+}
+
+const deleteParam = (paramIndex:number) => {
+  params.value.splice(paramIndex,1)
+}
+
+const deleteHeader = (paramIndex:number) => {
+  headers.value.splice(paramIndex,1)
 }
 
 const sendRequest = () =>{
@@ -175,11 +183,10 @@ watchEffect(() => {
                 />
         </el-col>
         <el-col :span="2" class="send-button-col">
-            <el-button class="send-button"
+            <el-button class="send-button" 
                   @click="sendRequest"
-                  type="success"
-                  :icon="SendIcon"
-                  >Send</el-button
+                  type="success" :disabled="sendloading"
+                  >Send<el-icon><ChevronsRightIcon/></el-icon></el-button
                 >
         </el-col>
       </el-row>
@@ -195,7 +202,7 @@ watchEffect(() => {
                     <el-button :icon="PlusIcon" @click="addParam">Add</el-button>
                 </el-row>
 
-              <el-row class="form-row" v-for="param in params">
+              <el-row class="form-row" v-for="(param,paramIndex) in params">
                 <el-col :span="11" >
                     <div class="margin-right-10px">
                         <el-input
@@ -217,7 +224,7 @@ watchEffect(() => {
                     <el-switch v-model="param.enabled" size="small" />
                 </el-col>
                 <el-col :span="1">
-                    <el-button type="default" :icon="Trash2Icon" />
+                    <el-button type="default" @click="deleteParam(paramIndex)" :icon="Trash2Icon" />
                 </el-col>
               </el-row>
             </el-tab-pane>
@@ -225,7 +232,7 @@ watchEffect(() => {
                 <el-row class="actions-row">
                     <el-button :icon="PlusIcon" @click="addHeader">Add</el-button>
                 </el-row>
-                <el-row class="form-row" v-for="header in headers">
+                <el-row class="form-row" v-for="(header,paramIndex) in headers">
                 <el-col :span="11" >
                     <div class="margin-right-10px">
                         <el-input
@@ -247,7 +254,7 @@ watchEffect(() => {
                     <el-switch v-model="header.enabled" size="small" />
                 </el-col>
                 <el-col :span="1">
-                    <el-button type="default" :icon="Trash2Icon" />
+                    <el-button type="default" @click="deleteHeader(paramIndex)" :icon="Trash2Icon" />
                 </el-col>
               </el-row>
             </el-tab-pane>

@@ -18,6 +18,7 @@ import ImportCollection from './settings/ImportCollection.vue'
 import { RequestService } from "../services/RequestService";
 import { ImportService } from "../services/ImportService";
 import { FalconService } from "../services/FalconService";
+import { StorageService } from "../services/StorageService";
 
 import { FalconProfile } from "../models/FalconProfile";
 import { Environment as EnvironmentModel, EnvironmentParam } from "../models/Environment";
@@ -41,6 +42,7 @@ const environment = ref("default")
 const environmentsFormVisible = ref(false)
 const environments = ref<any>()
 const importFormVisible = ref(false)
+const sendloading = ref(false)
 
 //Global variables
 //
@@ -50,7 +52,9 @@ let environmentVariables: any = []
 //
 ipcRenderer.on('selected-folder', function (event, path) {
   //do what you want with the path/file selected, for example:
-
+  if (!StorageService.isDirectory(path[0])){
+    return
+  }
   workspace.value = path[0];
   try {
     ProfileService.update(new FalconProfile(workspace.value))
@@ -163,6 +167,7 @@ const onSendRequest = (requestTemplate: any) => {
 
   console.log(headers)
   let starttime = Date.now()
+  sendloading.value = true
   fetch(url, options).then((response: any) => {
     console.log(response, response.status, response.statusText)
 
@@ -208,11 +213,13 @@ const onSendRequest = (requestTemplate: any) => {
 
       console.log(context.envdata)
       environments.value = EnvironmentService.getAll()
+      sendloading.value = false
 
     })
 
   }).catch((err: any) => {
     console.log(err)
+    sendloading.value = false
   })
 
 }
@@ -288,9 +295,9 @@ onMounted(() => {
         <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected" :msg="true"></WorkspaceFolder>
       </el-col>
       <el-col :span="19">
-        <RequestContainer @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item">
+        <RequestContainer :sendloading="sendloading" @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item">
         </RequestContainer>
-        <ResponseContainer :item="item"></ResponseContainer>
+        <ResponseContainer :sendloading="sendloading" :item="item"></ResponseContainer>
       </el-col>
     </el-row>
 

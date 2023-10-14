@@ -17,7 +17,7 @@ ace.config.setModuleUrl("ace/mode/json_worker", workerJsonUrl);
 import { NameValueEnabled } from '../common/model';
 
 //Properties
-const props = defineProps<{ item: any }>();
+const props = defineProps<{ item: any, sendloading:boolean }>();
 const emit = defineEmits([]);
 
 // Variables
@@ -97,7 +97,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <el-row class="response">
+  <el-row class="response" v-loading="sendloading">
     <el-col :span="24">
       <el-row>
         <el-col :span="18">
