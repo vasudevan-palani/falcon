@@ -97,7 +97,8 @@ function readDirectoryRecursive(dirPath: string): any {
     return { id: dirPath, label: path.basename(dirPath) };
   }
 
-  const files = fs.readdirSync(dirPath);
+  const allfiles = fs.readdirSync(dirPath);
+  const files = allfiles.filter((file:any) => !file.startsWith('.'));
   const children = [];
 
   for (const file of files) {
