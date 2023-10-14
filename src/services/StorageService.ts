@@ -1,5 +1,6 @@
 const os = require('os')
 const fs = require('fs')
+const path = require('path')
 
 export class StorageService {
     static writeSync(url: string, data: string) {
@@ -26,5 +27,14 @@ export class StorageService {
         } catch (error) {
             return false;
         }
+    }
+
+    static renameFileFolder(fullpath: string, newValue : string){
+        console.log(fullpath,newValue)
+        let parentDirectory = path.dirname(fullpath)
+        let newpath = path.join(parentDirectory, newValue);
+        console.log(fullpath,newpath)
+        fs.renameSync(fullpath, newpath);
+        //fs.renameSync(path, newValue);
     }
 }

@@ -70,6 +70,10 @@ const onDeleteFileOrDirectory = (targetPath: string) => {
   })
 }
 
+const onRename = () => {
+  scanWorkspace(workspaceDirectory.value)
+}
+
 // Click handlers
 //
 const chooseWorkspace = () => {
@@ -133,7 +137,7 @@ watchEffect(() => {
 
   </el-row>
   <ListFiles :workspace-dir="workspaceDirectory" :items="items" @on-file-select="onFileSelect" @on-create-request="onCreateRequest"
-    @on-create-folder="onCreateFolder" @on-delete-file-or-directory="onDeleteFileOrDirectory"></ListFiles>
+    @on-create-folder="onCreateFolder" @on-delete-file-or-directory="onDeleteFileOrDirectory" @on-rename="onRename"></ListFiles>
 </template>
 
 <style scoped>
