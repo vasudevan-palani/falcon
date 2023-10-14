@@ -3,6 +3,7 @@ import { onMounted, ref, watchEffect } from "vue";
 import RequestContainer from './request/RequestContainer.vue';
 import ResponseContainer from './response/ResponseContainer.vue';
 import WorkspaceFolder from './WorkspaceFolder.vue';
+
 import { FolderIcon, SettingsIcon, ExternalLinkIcon, DownloadIcon, RefreshCwIcon } from "@vue-icons/feather";
 import fetch from 'node-fetch';
 import { NameValueEnabled } from "./common/model";
@@ -10,7 +11,8 @@ import { ipcRenderer } from "electron";
 
 import { truncateText, readFileContent } from '../services/utils'
 import Environment from './settings/Environment.vue'
-
+import SplitPane from "vue3-page-split";
+import "vue3-page-split/dist/style.css";
 import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
 import { EnvironmentService } from '../services/EnvironmentService'
@@ -64,6 +66,17 @@ ipcRenderer.on('selected-folder', function (event, path) {
     NotificationService.showMessage("UNable to save Profile.")
   }
 });
+
+const onresizeLineStartMove = () => {
+  console.log("onresizeLineStartMove");
+}
+const onResizeLineMove = (e) => {
+  console.log("onResizeLineMove :>> ", e);
+}
+
+const onresizeLineEndMove = () => {
+  console.log("onresizeLineEndMove");
+}
 
 
 const onRequestSelected = (itemSelected: any) => {
@@ -295,9 +308,27 @@ onMounted(() => {
         <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected" :msg="true"></WorkspaceFolder>
       </el-col>
       <el-col :span="19">
-        <RequestContainer :sendloading="sendloading" @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item">
+        <SplitPane
+    backgroundColor="rgb(250,250,250)"
+    
+    :distribute="0.5"
+    :lineThickness="2"
+    :isVertical="false"
+    @resizeLineStartMove="onresizeLineStartMove"
+    @resizeLineMove="onResizeLineMove"
+    @resizeLineEndMove="onresizeLineEndMove"
+  >
+    <template v-slot:first>
+      <RequestContainer :sendloading="sendloading" @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item">
         </RequestContainer>
-        <ResponseContainer :sendloading="sendloading" :item="item"></ResponseContainer>
+    </template>
+    <template v-slot:second>
+      <ResponseContainer :sendloading="sendloading" :item="item"></ResponseContainer>
+    </template>
+  </SplitPane>
+        
+        
+        
       </el-col>
     </el-row>
 

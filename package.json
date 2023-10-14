@@ -55,6 +55,7 @@
     "vue-json-editor": "^1.4.3",
     "vue-router": "^4.2.5",
     "vue3-ace-editor": "^2.2.3",
+    "vue3-page-split": "^2.2.0",
     "vue3-ts-jsoneditor": "^2.9.0"
   }
 }

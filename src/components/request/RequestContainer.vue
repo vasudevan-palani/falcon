@@ -330,9 +330,9 @@ watchEffect(() => {
   border: #EEE 1px solid;
   border-radius: 5px;
   padding: 10px;
-  margin-top: 10px;
+  
   margin-right: 10px;
-  height: 450px;
+  height: 98%;
   overflow-y: scroll;
   text-align: left;
 }

@@ -161,7 +161,7 @@ watchEffect(() => {
   padding: 10px;
   margin-top: 10px;
   margin-right: 10px;
-  height: 440px;
+  height: 96%;
   overflow-y: scroll;
   text-align: left;
 }
