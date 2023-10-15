@@ -11,7 +11,10 @@ import { ipcRenderer } from "electron";
 
 import { truncateText, readFileContent } from '../services/utils'
 import Environment from './settings/Environment.vue'
+
+// @ts-ignore
 import SplitPane from "vue3-page-split";
+
 import "vue3-page-split/dist/style.css";
 import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
@@ -70,7 +73,7 @@ ipcRenderer.on('selected-folder', function (event, path) {
 const onresizeLineStartMove = () => {
   console.log("onresizeLineStartMove");
 }
-const onResizeLineMove = (e) => {
+const onResizeLineMove = (e:any) => {
   console.log("onResizeLineMove :>> ", e);
 }
 

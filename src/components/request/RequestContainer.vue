@@ -271,7 +271,7 @@ watchEffect(() => {
         <el-col :span="2" class="send-button-col">
           <el-button class="send-button" @click="sendRequest" type="primary" :disabled="sendloading">Send
             <el-icon>
-              <ChevronsRightIcon></ChevronsRightIcon>
+              <ChevronsRightIcon :size="1"></ChevronsRightIcon>
             </el-icon></el-button>
         </el-col>
       </el-row>

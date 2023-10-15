@@ -1,8 +1,8 @@
 {
-  "name": "falcon",
-  "version": "1.0.1",
+  "name": "falconfly",
+  "version": "1.1.0",
   "main": "dist-electron/main/index.js",
-  "description": "Post Box Application",
+  "description": "FalconFly Application",
   "author": "vasudevan.palani@gmail.com",
   "license": "MIT",
   "private": true,
