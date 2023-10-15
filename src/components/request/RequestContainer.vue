@@ -118,6 +118,15 @@ const onGqlVariableChange = (content: any) => {
 
 }
 
+const onChangeSelectedContentType = () => {
+  let contentType = selectedContentType.value
+
+  if (contentType == "application/graphql"){
+    contentType = "application/json"
+  }
+  crudateHeader("content-type",contentType)
+}
+
 // Click handlers
 //
 const handleTabClick = () => {
@@ -194,6 +203,18 @@ const deleteUrlEncodedParam = (index:number) => {
 
 //Utility function
 //
+
+const crudateHeader = (headerName:string,headerValue:string) => {
+  const lowercaseHeaderName = headerName.toLowerCase();
+  const index = headers.value.findIndex((header:any) => header.name.toLowerCase() === lowercaseHeaderName);
+
+  if (index !== -1) {
+    headers.value[index].value = headerValue;
+  } else {
+    // If the header doesn't exist, you can add it to the array
+    headers.value.push({ name: headerName, value: headerValue,enabled:true });
+  }
+}
 
 watchEffect(() => {
   console.log("in req container", props.item)
@@ -309,7 +330,7 @@ watchEffect(() => {
             <el-tab-pane label="Body" name="body">
               <el-row class="content-type-row">
                 <el-col>
-                  <el-radio-group v-model="selectedContentType" class="ml-4">
+                  <el-radio-group v-model="selectedContentType" class="ml-4" @change="onChangeSelectedContentType">
                     <el-radio v-for="contentType in contentTypes" :label="contentType.value">{{ contentType.label
                     }}</el-radio>
                   </el-radio-group>
