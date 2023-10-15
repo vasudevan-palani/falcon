@@ -21,8 +21,8 @@ async function createWindow() {
   win = new electron.BrowserWindow({
     title: "Main window",
     titleBarStyle: "hidden",
-    width: 1280,
-    height: 720,
+    width: 1920,
+    height: 1080,
     icon: node_path.join(process.env.VITE_PUBLIC, "dist/falconicon_512.icns"),
     webPreferences: {
       preload,

@@ -3,7 +3,7 @@
 // Imports
 //
 import { reactive, ref, watchEffect, onMounted } from "vue";
-import { SearchIcon, PlusIcon, Trash2Icon, FolderIcon, Edit2Icon } from "@vue-icons/feather";
+import { SearchIcon, RefreshCcwIcon as RefreshIcon, Trash2Icon, FolderIcon, Edit2Icon } from "@vue-icons/feather";
 import { ElTreeV2, ElPopconfirm, ElPopover } from 'element-plus'
 import type { TreeNodeData, FilterMethod } from 'element-plus/es/components/tree-v2/src/types'
 
@@ -11,7 +11,7 @@ import {StorageService} from '../services/StorageService'
 import { FileIcon } from "@vue-icons/feather";
 //Properties
 const props = defineProps<{ items: any, workspaceDir: string }>();
-const emit = defineEmits(["onFileSelect", "onFolderSelect", "onCreateRequest", "onCreateFolder", "onDeleteFileOrDirectory","onRename"]);
+const emit = defineEmits(["onFileSelect", "onFolderSelect", "onCreateRequest", "onCreateFolder", "onDeleteFileOrDirectory","onRename","onRefresh"]);
 
 //Interfaces
 //
@@ -107,6 +107,10 @@ const createFolder = () => {
   newFolderVisible.value = !newFolderVisible.value;
 }
 
+const emitRefresh = () => {
+  emit("onRefresh")
+}
+
 const createRequest = () => {
 
   console.log("Creating request in ", getCurrentFileOrDir())
@@ -169,7 +173,7 @@ watchEffect(() => {
     <el-input v-model="filter" @input="onQueryChanged" class="w-50 m-2" size="large" placeholder="Search"
       :suffix-icon="SearchIcon" />
     <el-row class="file-actions-row">
-      <el-col :span="6">
+      <el-col :span="5">
         <el-popover :visible="newFolderVisible" placement="right" :width="500">
           <el-row class="margin-bottom-10">
             <el-col :span="24">
@@ -200,7 +204,11 @@ watchEffect(() => {
         </el-popover>
 
       </el-col>
-      <el-col :span="6">
+      <el-col :span="5">
+        <el-button title="Refresh" type="primary" @click="emitRefresh()" plain
+              :icon="RefreshIcon" circle></el-button>
+      </el-col>
+      <el-col :span="5">
         <el-popover :visible="newRequestVisible" placement="right" :width="500">
           <el-row class="margin-bottom-10">
             <el-col :span="24">
@@ -232,16 +240,7 @@ watchEffect(() => {
         </el-popover>
 
       </el-col>
-      <el-col :span="6">
-        <el-popconfirm width="400" confirm-button-text="OK" cancel-button-text="No, Thanks" icon-color="#626AEF"
-          :title="getDeleteConfirmTitle()" @confirm="deleteSelectedFileFolder">
-          <template #reference>
-            <el-button title="Delete File/Folder" type="danger" :disabled="selectedFolder == undefined && selectedFile == undefined" plain
-              :icon="Trash2Icon" circle></el-button>
-          </template>
-        </el-popconfirm>
-      </el-col>
-      <el-col :span="6">
+      <el-col :span="5">
         <el-popover :visible="renameFormVisible" placement="right" :width="500">
           <el-row class="margin-bottom-10">
             <el-col :span="24">
@@ -271,6 +270,16 @@ watchEffect(() => {
           </template>
         </el-popover>
       </el-col>
+      <el-col :span="4">
+        <el-popconfirm width="400" confirm-button-text="OK" cancel-button-text="No, Thanks" icon-color="#626AEF"
+          :title="getDeleteConfirmTitle()" @confirm="deleteSelectedFileFolder">
+          <template #reference>
+            <el-button title="Delete File/Folder" type="danger" :disabled="selectedFolder == undefined && selectedFile == undefined" plain
+              :icon="Trash2Icon" circle></el-button>
+          </template>
+        </el-popconfirm>
+      </el-col>
+
     </el-row>
   </el-row>
   <el-col :span="24" v-if="fileList.length > 0">

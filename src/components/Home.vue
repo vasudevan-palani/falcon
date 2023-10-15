@@ -40,7 +40,7 @@ const emit = defineEmits([]);
 const item = ref<any>()
 const requestFilePath = ref("")
 const workspace = ref("")
-const environment = ref("default")
+const environ = ref("default")
 const environmentsFormVisible = ref(false)
 const environments = ref<any>()
 const importFormVisible = ref(false)
@@ -54,7 +54,7 @@ let environmentVariables: any = []
 //
 ipcRenderer.on('selected-folder', function (event, path) {
   //do what you want with the path/file selected, for example:
-  if (!StorageService.isDirectory(path[0])){
+  if (!StorageService.isDirectory(path[0])) {
     return
   }
   workspace.value = path[0];
@@ -100,8 +100,13 @@ const onSaveRequest = (request: Request) => {
   }
 }
 
+const envSelectChange = (item: any) => {
+  console.log(item)
+}
+
 const onEnvChange = () => {
   environmentsFormVisible.value = false
+  let env_val = environ.value
 
   try {
     let data = EnvironmentService.getAll()
@@ -112,7 +117,9 @@ const onEnvChange = () => {
         "label": env.label
       }
     })
+    console.log("environments", envs)
     environments.value = envs
+    environ.value = env_val
   } catch (err) {
     NotificationService.showMessage("Unable to load env" + err)
   }
@@ -130,8 +137,8 @@ const onImportComplete = () => {
 
 
 const onSendRequest = (requestTemplate: any) => {
-
-  let env: EnvironmentModel | undefined = EnvironmentService.get(environment.value)
+  console.log(environ.value)
+  let env: EnvironmentModel | undefined = EnvironmentService.get(environ.value)
 
   if (env == undefined) {
     NotificationService.showMessage("Unable to find the environment")
@@ -139,8 +146,14 @@ const onSendRequest = (requestTemplate: any) => {
 
   let envdata: EnvironmentParam[] | undefined = env?.params
 
-  console.log(requestTemplate, envdata)
-  const requestString = mustache.render(JSON.stringify(requestTemplate), envdata);
+  console.log("onSendRequest", requestTemplate, envdata)
+  let envFormattedData: any = {}
+  envdata?.map((envItem: any) => {
+    if (envItem.enabled == true) {
+      envFormattedData[envItem.name] = envItem.value
+    }
+  })
+  const requestString = mustache.render(JSON.stringify(requestTemplate), envFormattedData);
   console.log(requestString)
 
   let request = JSON.parse(requestString)
@@ -173,6 +186,15 @@ const onSendRequest = (requestTemplate: any) => {
     method: request.httpmethod,
     headers: headers
   }
+  console.log(request.selectedContentType)
+  if (request.selectedContentType == 'application/graphql') {
+    request.body = JSON.stringify({
+      "query": request.gqlQueryBody,
+      "variables": request.gqlVariable
+    })
+    console.log(request.body)
+  }
+
 
   if (["POST", "PUT", "PATCH", "DELETE", "OPTIONS"].includes(request.httpmethod)) {
     options.body = request.body;
@@ -181,6 +203,7 @@ const onSendRequest = (requestTemplate: any) => {
   console.log(headers)
   let starttime = Date.now()
   sendloading.value = true
+  console.log(options)
   fetch(url, options).then((response: any) => {
     console.log(response, response.status, response.statusText)
 
@@ -210,7 +233,7 @@ const onSendRequest = (requestTemplate: any) => {
         "envdata": envdata,
         "request": item.value.request,
         "response": item.value.response,
-        "falcon": new FalconService(environment.value, envdata)
+        "falcon": new FalconService(environ.value, envdata)
       }
 
       vm.createContext(context);
@@ -225,7 +248,14 @@ const onSendRequest = (requestTemplate: any) => {
 
 
       console.log(context.envdata)
-      environments.value = EnvironmentService.getAll()
+      environmentVariables = EnvironmentService.getAll()
+      let envs = environmentVariables.map((env: EnvironmentModel) => {
+        return {
+          "value": env.name,
+          "label": env.label
+        }
+      })
+      environments.value = envs
       sendloading.value = false
 
     })
@@ -290,13 +320,13 @@ onMounted(() => {
 
       <el-col :span="13" class="middle-menu">
         <el-text :title="workspace">Workspace : {{ truncateText(workspace, 100) }} &nbsp;&nbsp;</el-text>
-        <el-button :icon="RefreshCwIcon" @click="refreshWorkspace">Refresh</el-button>
+        <!-- <el-button :icon="RefreshCwIcon" @click="refreshWorkspace">Refresh</el-button> -->
         <el-button :icon="FolderIcon" @click="chooseWorkspace">Change</el-button>
       </el-col>
 
       <el-col :span="6" class="environment-col">
         <el-link @click="environmentsFormVisible = true" type="primary">Environment:&nbsp;</el-link>
-        <el-select class="settings-button" v-model="environment" placeholder="Select" size="default">
+        <el-select class="settings-button" v-model="environ" placeholder="Select" @change="envSelectChange">
           <el-option v-for="item in environments" :key="item.label" :label="item.label" :value="item.value" />
         </el-select>
         <!--el-button class="settings-button" :icon="SettingsIcon">Settings</el-button-->
@@ -308,27 +338,21 @@ onMounted(() => {
         <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected" :msg="true"></WorkspaceFolder>
       </el-col>
       <el-col :span="19">
-        <SplitPane
-    backgroundColor="rgb(250,250,250)"
-    
-    :distribute="0.5"
-    :lineThickness="2"
-    :isVertical="false"
-    @resizeLineStartMove="onresizeLineStartMove"
-    @resizeLineMove="onResizeLineMove"
-    @resizeLineEndMove="onresizeLineEndMove"
-  >
-    <template v-slot:first>
-      <RequestContainer :sendloading="sendloading" @on-save-request="onSaveRequest" @on-send-request="onSendRequest" :item="item">
-        </RequestContainer>
-    </template>
-    <template v-slot:second>
-      <ResponseContainer :sendloading="sendloading" :item="item"></ResponseContainer>
-    </template>
-  </SplitPane>
-        
-        
-        
+        <SplitPane backgroundColor="rgb(250,250,250)" :distribute="0.5" :lineThickness="2" :isVertical="false"
+          @resizeLineStartMove="onresizeLineStartMove" @resizeLineMove="onResizeLineMove"
+          @resizeLineEndMove="onresizeLineEndMove">
+          <template v-slot:first>
+            <RequestContainer :sendloading="sendloading" @on-save-request="onSaveRequest" @on-send-request="onSendRequest"
+              :item="item">
+            </RequestContainer>
+          </template>
+          <template v-slot:second>
+            <ResponseContainer :sendloading="sendloading" :item="item"></ResponseContainer>
+          </template>
+        </SplitPane>
+
+
+
       </el-col>
     </el-row>
 
