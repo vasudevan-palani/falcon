@@ -205,10 +205,6 @@ watchEffect(() => {
 
       </el-col>
       <el-col :span="5">
-        <el-button title="Refresh" type="primary" @click="emitRefresh()" plain
-              :icon="RefreshIcon" circle></el-button>
-      </el-col>
-      <el-col :span="5">
         <el-popover :visible="newRequestVisible" placement="right" :width="500">
           <el-row class="margin-bottom-10">
             <el-col :span="24">
@@ -239,6 +235,10 @@ watchEffect(() => {
           </template>
         </el-popover>
 
+      </el-col>
+      <el-col :span="5">
+        <el-button title="Refresh" type="primary" @click="emitRefresh()" plain
+              :icon="RefreshIcon" circle></el-button>
       </el-col>
       <el-col :span="5">
         <el-popover :visible="renameFormVisible" placement="right" :width="500">

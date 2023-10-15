@@ -10,6 +10,7 @@ export class Request{
     selectedContentType : string
     gqlVariable : string
     gqlQueryBody : string
+    urlEncodedParams : NameValueEnabled[]
 
     constructor(
         requestName : string,
@@ -21,7 +22,8 @@ export class Request{
         script:string,
         selectedContentType:string,
         gqlVariable:string,
-        gqlQueryBody:string
+        gqlQueryBody:string,
+        urlEncodedParams : NameValueEnabled[]
     ){
         this.requestName  = requestName
         this.body = body
@@ -33,5 +35,6 @@ export class Request{
         this.selectedContentType = selectedContentType
         this.gqlVariable = gqlVariable
         this.gqlQueryBody = gqlQueryBody
+        this.urlEncodedParams = urlEncodedParams
     }
 }

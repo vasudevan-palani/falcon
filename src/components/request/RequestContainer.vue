@@ -37,6 +37,7 @@ const contentTypes = ref<any[]>([])
 const selectedContentType = ref("none")
 const gqlQueryBody = ref("")
 const gqlVariable = ref("")
+const urlEncodedParams = ref<NameValueEnabled[]>([])
 
 //Global variables
 //
@@ -109,11 +110,11 @@ const onRequestScriptChange = (script: any) => {
   console.log(script)
 }
 
-const onGqlQueryBodyChange = (content : any) => {
+const onGqlQueryBodyChange = (content: any) => {
 
 }
 
-const onGqlVariableChange = (content : any) => {
+const onGqlVariableChange = (content: any) => {
 
 }
 
@@ -149,16 +150,17 @@ const deleteHeader = (paramIndex: number) => {
 
 const sendRequest = () => {
   console.log("request", headers.value, params.value, requestBody.value, httpurl.value, httpmethod.value)
-  emit('onSendRequest', { 
-    body: requestBody.value, 
-    headers: headers.value, 
-    params: params.value, 
-    httpurl: httpurl.value, 
-    httpmethod: httpmethod.value, 
+  emit('onSendRequest', {
+    body: requestBody.value,
+    headers: headers.value,
+    params: params.value,
+    httpurl: httpurl.value,
+    httpmethod: httpmethod.value,
     script: requestScript.value,
-    selectedContentType : selectedContentType.value,
-    gqlQueryBody : gqlQueryBody.value,
-    gqlVariable : gqlVariable.value
+    selectedContentType: selectedContentType.value,
+    gqlQueryBody: gqlQueryBody.value,
+    gqlVariable: gqlVariable.value,
+    urlEncodedParams : urlEncodedParams.value
   })
 }
 
@@ -171,10 +173,23 @@ const saveRequest = () => {
     url: httpurl.value,
     httpmethod: httpmethod.value,
     script: requestScript.value,
-    selectedContentType : selectedContentType.value,
-    gqlQueryBody : gqlQueryBody.value,
-    gqlVariable : gqlVariable.value
+    selectedContentType: selectedContentType.value,
+    gqlQueryBody: gqlQueryBody.value,
+    gqlVariable: gqlVariable.value,
+    urlEncodedParams : urlEncodedParams.value
   })
+}
+
+const addUrlEncodedParam = () => {
+  urlEncodedParams.value.push({
+    "name": "",
+    "value": "",
+    "enabled": true
+  })
+}
+
+const deleteUrlEncodedParam = (index:number) => {
+  urlEncodedParams.value.splice(index,1)
 }
 
 //Utility function
@@ -194,6 +209,13 @@ watchEffect(() => {
   selectedContentType.value = props.item.selectedContentType,
   gqlQueryBody.value = props.item.gqlQueryBody,
   gqlVariable.value = props.item.gqlVariable
+
+  urlEncodedParams.value = props.item.urlEncodedParams
+
+  if (urlEncodedParams.value == undefined){
+    urlEncodedParams.value = []
+  }
+
   if (props.item.body != undefined && props.item.body != '') {
     requestBody.value = JSON.stringify(JSON.parse(props.item.body), null, 4);
   }
@@ -210,7 +232,7 @@ watchEffect(() => {
     <el-col>
       <el-row class="name-row">
         <el-col :span="2">
-          <el-button class="save-button" @click="saveRequest" type="primary" :icon="SaveIcon">Save</el-button>
+          <el-button title="save" class="save-button" @click="saveRequest" type="primary" plain :icon="SaveIcon">Save</el-button>
         </el-col>
         <el-col :span="22">
           <el-input v-model="requestName" class="w-50 m-2" placeholder="Name" />
@@ -226,7 +248,7 @@ watchEffect(() => {
           <el-input v-model="httpurl" class="w-50 m-2" placeholder="Url" />
         </el-col>
         <el-col :span="2" class="send-button-col">
-          <el-button class="send-button" @click="sendRequest" type="success" :disabled="sendloading">Send
+          <el-button class="send-button" @click="sendRequest" type="primary" :disabled="sendloading">Send
             <el-icon>
               <ChevronsRightIcon></ChevronsRightIcon>
             </el-icon></el-button>
@@ -287,26 +309,53 @@ watchEffect(() => {
             <el-tab-pane label="Body" name="body">
               <el-row class="content-type-row">
                 <el-col>
-                <el-radio-group v-model="selectedContentType" class="ml-4">
-                  <el-radio v-for="contentType in contentTypes"
-                    :label="contentType.value">{{ contentType.label }}</el-radio>
-                </el-radio-group>
-              </el-col>
-            </el-row>
-            <el-row v-if="selectedContentType == 'application/graphql'" class="form-row">
-                    <el-col :span="16">
-                    <el-text>query</el-text>
-                      <v-ace-editor v-model:value="gqlQueryBody" @update:value="onGqlQueryBodyChange" lang="graphql"
+                  <el-radio-group v-model="selectedContentType" class="ml-4">
+                    <el-radio v-for="contentType in contentTypes" :label="contentType.value">{{ contentType.label
+                    }}</el-radio>
+                  </el-radio-group>
+                </el-col>
+              </el-row>
+              <el-row v-if="selectedContentType == 'application/graphql'" class="form-row">
+                <el-col :span="16">
+                  <el-text>query</el-text>
+                  <v-ace-editor v-model:value="gqlQueryBody" @update:value="onGqlQueryBodyChange" lang="graphql"
                     :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
                     style="height: 300px" />
-                    </el-col>
-                    <el-col :span="8">
-                      <el-text>variables</el-text>
-                      <v-ace-editor v-model:value="gqlVariable" @update:value="onGqlVariableChange" lang="json"
+                </el-col>
+                <el-col :span="8">
+                  <el-text>variables</el-text>
+                  <v-ace-editor v-model:value="gqlVariable" @update:value="onGqlVariableChange" lang="json"
                     :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
                     style="height: 300px" />
+                </el-col>
+              </el-row>
+              <el-row v-if="selectedContentType == 'application/x-www-form-urlencoded'">
+                <el-col>
+                  <el-row class="actions-row">
+                    <el-button :icon="PlusIcon" @click="addUrlEncodedParam">Add</el-button>
+                  </el-row>
+
+                  <el-row class="form-row" v-for="(param, paramIndex) in urlEncodedParams">
+                    <el-col :span="11">
+                      <div class="margin-right-10px">
+                        <el-input v-model="param.name" placeholder="param name" />
+                      </div>
                     </el-col>
-            </el-row>
+                    <el-col :span="11">
+                      <div>
+                        <el-input v-model="param.value" placeholder="param value" />
+                      </div>
+
+                    </el-col>
+                    <el-col :span="1" class="check-box-col">
+                      <el-switch v-model="param.enabled" size="small" />
+                    </el-col>
+                    <el-col :span="1">
+                      <el-button type="default" @click="deleteUrlEncodedParam(paramIndex)" :icon="Trash2Icon" />
+                    </el-col>
+                  </el-row>
+                </el-col>
+              </el-row>
               <el-row v-else class="form-row">
                 <el-col>
                   <v-ace-editor v-model:value="requestBody" @update:value="onRequestBodyChange" lang="json"
@@ -363,9 +412,10 @@ watchEffect(() => {
   margin-bottom: 10px;
 }
 
-.content-type-row{
+.content-type-row {
   margin-bottom: 10px;
 }
+
 .url-row {
   margin-top: 10px;
 }

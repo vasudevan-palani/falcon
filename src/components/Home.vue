@@ -135,6 +135,12 @@ const onImportComplete = () => {
   refreshWorkspace();
 }
 
+function encodeFormData(data:any) {
+  return data
+    .map((item:any) => `${encodeURIComponent(item.name)}=${encodeURIComponent(item.value)}`)
+    .join('&');
+}
+
 
 const onSendRequest = (requestTemplate: any) => {
   console.log(environ.value)
@@ -192,6 +198,11 @@ const onSendRequest = (requestTemplate: any) => {
       "query": request.gqlQueryBody,
       "variables": request.gqlVariable
     })
+    console.log(request.body)
+  }
+
+  if (request.selectedContentType == 'application/x-www-form-urlencoded') {
+    request.body = encodeFormData(request.urlEncodedParams);
     console.log(request.body)
   }
 
@@ -401,5 +412,6 @@ onMounted(() => {
   text-align: left;
   margin-top: 7px;
   margin-left: 10px;
+  margin-bottom:10px;
 }
 </style>

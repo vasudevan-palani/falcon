@@ -20,14 +20,15 @@ export class RequestService{
             dataJson.script,
             dataJson.selectedContentType,
             dataJson.gqlVariable,
-            dataJson.gqlQueryBody
+            dataJson.gqlQueryBody,
+            dataJson.urlEncodedParams
         )
     }
     static save(filePath:string,data:Request){
         StorageService.writeSync(filePath,JSON.stringify(data))
     }
     static add(filePath:string,filename:string){
-        let request = new Request("New Request","",[],[],"","","","","","")
+        let request = new Request("New Request","",[],[],"","","","","","",[])
         StorageService.writeSync(`${filePath}/${filename}.json`,JSON.stringify(request))
         return request
     }
