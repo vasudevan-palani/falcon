@@ -73,7 +73,7 @@ ipcRenderer.on('selected-folder', function (event, path) {
 const onresizeLineStartMove = () => {
   console.log("onresizeLineStartMove");
 }
-const onResizeLineMove = (e:any) => {
+const onResizeLineMove = (e: any) => {
   console.log("onResizeLineMove :>> ", e);
 }
 
@@ -138,146 +138,153 @@ const onImportComplete = () => {
   refreshWorkspace();
 }
 
-function encodeFormData(data:any) {
+function encodeFormData(data: any) {
   return data
-    .map((item:any) => `${encodeURIComponent(item.name)}=${encodeURIComponent(item.value)}`)
+    .map((item: any) => `${encodeURIComponent(item.name)}=${encodeURIComponent(item.value)}`)
     .join('&');
 }
 
 
 const onSendRequest = (requestTemplate: any) => {
-  console.log(environ.value)
-  let env: EnvironmentModel | undefined = EnvironmentService.get(environ.value)
 
-  if (env == undefined) {
-    NotificationService.showMessage("Unable to find the environment")
-  }
+  try {
+    console.log(environ.value)
+    let env: EnvironmentModel | undefined = EnvironmentService.get(environ.value)
 
-  let envdata: EnvironmentParam[] | undefined = env?.params
-
-  console.log("onSendRequest", requestTemplate, envdata)
-  let envFormattedData: any = {}
-  envdata?.map((envItem: any) => {
-    if (envItem.enabled == true) {
-      envFormattedData[envItem.name] = envItem.value
-    }
-  })
-  const requestString = mustache.render(JSON.stringify(requestTemplate), envFormattedData);
-  console.log(requestString)
-
-  let request = JSON.parse(requestString)
-
-  let headers: any = {}
-
-  for (let headerIndex in request.headers) {
-    let headerEnabled = request.headers[headerIndex].enabled;
-    let headerName: string = request.headers[headerIndex].name;
-    let headerValue = request.headers[headerIndex].value;
-    if (headerEnabled == true) {
-      headers[headerName] = headerValue
+    if (env == undefined) {
+      NotificationService.showMessage("Unable to find the environment")
     }
 
-  }
-  let url = request.httpurl
+    let envdata: EnvironmentParam[] | undefined = env?.params
 
-  if (request.params.length > 0) {
-    url = url + "?"
-    for (let paramIndex in request.params) {
-      let paramName = request.params[paramIndex].name
-      let paramValue = request.params[paramIndex].value
-      url = url + `${paramName}=${paramValue}&`
-    }
-  }
-  console.log(url)
-  //return;
-
-  let options: any = {
-    method: request.httpmethod,
-    headers: headers
-  }
-  console.log(request.selectedContentType)
-  if (request.selectedContentType == 'application/graphql') {
-    request.body = JSON.stringify({
-      "query": request.gqlQueryBody,
-      "variables": request.gqlVariable
+    console.log("onSendRequest", requestTemplate, envdata)
+    let envFormattedData: any = {}
+    envdata?.map((envItem: any) => {
+      if (envItem.enabled == true) {
+        envFormattedData[envItem.name] = envItem.value
+      }
     })
-    console.log(request.body)
-  }
+    const requestString = mustache.render(JSON.stringify(requestTemplate), envFormattedData);
+    console.log(requestString)
 
-  if (request.selectedContentType == 'application/x-www-form-urlencoded') {
-    request.body = encodeFormData(request.urlEncodedParams);
-    console.log(request.body)
-  }
+    let request = JSON.parse(requestString)
+
+    let headers: any = {}
+
+    for (let headerIndex in request.headers) {
+      let headerEnabled = request.headers[headerIndex].enabled;
+      let headerName: string = request.headers[headerIndex].name;
+      let headerValue = request.headers[headerIndex].value;
+      if (headerEnabled == true) {
+        headers[headerName] = headerValue
+      }
+
+    }
+    let url = request.httpurl
+
+    if (request.params.length > 0) {
+      url = url + "?"
+      for (let paramIndex in request.params) {
+        let paramName = request.params[paramIndex].name
+        let paramValue = request.params[paramIndex].value
+        url = url + `${paramName}=${paramValue}&`
+      }
+    }
+    console.log(url)
+    //return;
+
+    let options: any = {
+      method: request.httpmethod,
+      headers: headers
+    }
+    console.log(request.selectedContentType)
+    if (request.selectedContentType == 'application/graphql') {
+      request.body = JSON.stringify({
+        "query": request.gqlQueryBody,
+        "variables": request.gqlVariable
+      })
+      console.log(request.body)
+    }
+
+    if (request.selectedContentType == 'application/x-www-form-urlencoded') {
+      request.body = encodeFormData(request.urlEncodedParams);
+      console.log(request.body)
+    }
 
 
-  if (["POST", "PUT", "PATCH", "DELETE", "OPTIONS"].includes(request.httpmethod)) {
-    options.body = request.body;
-  }
+    if (["POST", "PUT", "PATCH", "DELETE", "OPTIONS"].includes(request.httpmethod)) {
+      options.body = request.body;
+    }
 
-  console.log(headers)
-  let starttime = Date.now()
-  sendloading.value = true
-  console.log(options)
-  fetch(url, options).then((response: any) => {
-    console.log(response, response.status, response.statusText)
+    console.log(headers)
+    let starttime = Date.now()
+    sendloading.value = true
+    console.log(options)
+    fetch(url, options).then((response: any) => {
+      console.log(response, response.status, response.statusText)
 
 
 
-    response.text().then((data: any) => {
-      let endtime = Date.now()
-      let responseHeaders: NameValueEnabled[] = []
-      response.headers.forEach((value: any, key: any) => {
-        responseHeaders.push({
-          "name": key,
-          "value": value,
-          "enabled": true
+      response.text().then((data: any) => {
+        let endtime = Date.now()
+        let responseHeaders: NameValueEnabled[] = []
+        response.headers.forEach((value: any, key: any) => {
+          responseHeaders.push({
+            "name": key,
+            "value": value,
+            "enabled": true
+          })
         })
-      })
 
-      item.value.response = {
-        "status": response.status,
-        "statusText": response.statusText,
-        "headers": responseHeaders,
-        "responseText": data,
-        "latency": endtime - starttime
-      }
-
-      let context: any = {
-        "JSON": JSON,
-        "envdata": envdata,
-        "request": item.value.request,
-        "response": item.value.response,
-        "falcon": new FalconService(environ.value, envdata)
-      }
-
-      vm.createContext(context);
-      console.log(request.script)
-      try {
-        vm.runInContext(request.script, context);
-      }
-      catch (err) {
-        console.log(err)
-        NotificationService.showMessage(String(err))
-      }
-
-
-      console.log(context.envdata)
-      environmentVariables = EnvironmentService.getAll()
-      let envs = environmentVariables.map((env: EnvironmentModel) => {
-        return {
-          "value": env.name,
-          "label": env.label
+        item.value.response = {
+          "status": response.status,
+          "statusText": response.statusText,
+          "headers": responseHeaders,
+          "responseText": data,
+          "latency": endtime - starttime
         }
+
+        let context: any = {
+          "JSON": JSON,
+          "envdata": envdata,
+          "request": item.value.request,
+          "response": item.value.response,
+          "falcon": new FalconService(environ.value, envdata)
+        }
+
+        vm.createContext(context);
+        console.log(request.script)
+        try {
+          vm.runInContext(request.script, context);
+        }
+        catch (err) {
+          console.log(err)
+          NotificationService.showMessage(String(err))
+        }
+
+
+        console.log(context.envdata)
+        environmentVariables = EnvironmentService.getAll()
+        let envs = environmentVariables.map((env: EnvironmentModel) => {
+          return {
+            "value": env.name,
+            "label": env.label
+          }
+        })
+        environments.value = envs
+        sendloading.value = false
+
       })
-      environments.value = envs
+
+    }).catch((err: any) => {
+      console.log(err)
+      NotificationService.showMessage("Error: " + String(err))
       sendloading.value = false
-
     })
+  } catch (err) {
+    NotificationService.showMessage("Error: " + String(err))
+  }
 
-  }).catch((err: any) => {
-    console.log(err)
-    sendloading.value = false
-  })
 
 }
 
@@ -305,7 +312,11 @@ onMounted(() => {
 
   try {
     let data: FalconProfile = ProfileService.get()
-    workspace.value = data.workspace;
+    console.log(data)
+    if (StorageService.isDirectory(data.workspace)) {
+      workspace.value = data.workspace;
+    }
+
     EnvironmentService.init()
   } catch (err) {
     NotificationService.showMessage("Unable to load env " + err)
@@ -415,6 +426,6 @@ onMounted(() => {
   text-align: left;
   margin-top: 7px;
   margin-left: 10px;
-  margin-bottom:10px;
+  margin-bottom: 10px;
 }
 </style>
