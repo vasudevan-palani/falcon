@@ -109,7 +109,7 @@ watchEffect(() => {
         </el-col>
       </el-row>
       <el-row v-if="responseStatus !=undefined">
-        <el-col :span="24">
+        <el-col :span="24" class="headers-col">
           <el-tabs v-model="activeName" class="aws-tabs" @tab-click="handleTabClick">
             <el-tab-pane name="headers">
               <template #label>
@@ -139,7 +139,7 @@ watchEffect(() => {
                     showPrintMargin: false,
                     readOnly: true,
                     wrap: true
-                  }" style="height: 300px" />
+                  }" style="height: 200px" />
                 </el-col>
               </el-row>
             </el-tab-pane>
@@ -161,8 +161,11 @@ watchEffect(() => {
   padding: 10px;
   margin-top: 10px;
   margin-right: 10px;
-  height: 96%;
   overflow-y: scroll;
   text-align: left;
+  
+}
+.headers-col{
+  max-height: 400px;
 }
 </style>

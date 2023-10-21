@@ -6,7 +6,7 @@ import { reactive, ref, watchEffect, onMounted } from "vue";
 import { SearchIcon, RefreshCcwIcon as RefreshIcon, Trash2Icon, FolderIcon, Edit2Icon } from "@vue-icons/feather";
 import { ElTreeV2, ElPopconfirm, ElPopover } from 'element-plus'
 import type { TreeNodeData, FilterMethod } from 'element-plus/es/components/tree-v2/src/types'
-
+import {collectionContainerHeight} from '../../config/main'
 import {StorageService} from '../services/StorageService'
 import { FileIcon } from "@vue-icons/feather";
 //Properties
@@ -283,8 +283,8 @@ watchEffect(() => {
     </el-row>
   </el-row>
   <el-col :span="24" v-if="fileList.length > 0">
-    <el-tree-v2 :filter-method="filterMethod" class="collection-list" ref="treeRef" @node-click="itemSelected"
-      @current-change="checkChange" :data="fileList" :props="treeprops" :height="700" />
+    <el-tree-v2 :filter-method="filterMethod" ref="treeRef" @node-click="itemSelected"
+      @current-change="checkChange" :data="fileList" :props="treeprops" />
   </el-col>
 </template>
 
@@ -294,7 +294,6 @@ watchEffect(() => {
   border: #EEE 1px solid;
   border-radius: 5px;
   margin: 10px;
-  height: 796px;
 }
 
 .margin-bottom-10 {

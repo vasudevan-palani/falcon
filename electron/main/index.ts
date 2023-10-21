@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain, autoUpdater,dialog } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
+import { windowHeight, windowWidth } from '../../config/main'
 
 // The built directory structure
 //
@@ -44,8 +45,8 @@ async function createWindow() {
   win = new BrowserWindow({
     title: 'Main window',
     titleBarStyle: 'hidden',
-    width:1920,
-    height:1080,
+    width:windowWidth,
+    height:windowHeight,
     icon: join(process.env.VITE_PUBLIC, 'dist/falconicon_512.icns'),
     webPreferences: {
       preload,
@@ -92,7 +93,7 @@ app.whenReady().then(()=>{
   console.log(position1)
   ipcMain.on('open-file-dialog', function (event) {
     dialog.showOpenDialog(win,{
-      properties: ['openDirectory']
+      properties: ['openDirectory','createDirectory']
     }).then((result)=>{
       let filepaths = result.filePaths
       console.log(result)

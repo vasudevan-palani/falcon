@@ -29,7 +29,7 @@ export class RequestService{
     }
     static add(filePath:string,filename:string){
         let request = new Request("New Request","",[],[],"","","","","","",[])
-        StorageService.writeSync(`${filePath}/${filename}.json`,JSON.stringify(request))
+        StorageService.writeSync(`${filePath}/${filename}`,JSON.stringify(request))
         return request
     }
 }

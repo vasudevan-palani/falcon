@@ -2,6 +2,11 @@
 const electron = require("electron");
 const node_os = require("node:os");
 const node_path = require("node:path");
+const windowHeight = 1080;
+const windowWidth = 1920;
+const collectionContainerHeight = windowHeight / 100 * 60;
+const requestContainerHeight = windowHeight / 100 * 50;
+console.log("collectionContainerHeight", collectionContainerHeight, "requestContainerHeight", requestContainerHeight);
 process.env.DIST_ELECTRON = node_path.join(__dirname, "..");
 process.env.DIST = node_path.join(process.env.DIST_ELECTRON, "../dist");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL ? node_path.join(process.env.DIST_ELECTRON, "../public") : process.env.DIST;
@@ -21,8 +26,8 @@ async function createWindow() {
   win = new electron.BrowserWindow({
     title: "Main window",
     titleBarStyle: "hidden",
-    width: 1920,
-    height: 1080,
+    width: windowWidth,
+    height: windowHeight,
     icon: node_path.join(process.env.VITE_PUBLIC, "dist/falconicon_512.icns"),
     webPreferences: {
       preload,
@@ -59,7 +64,7 @@ electron.app.whenReady().then(() => {
   console.log(position1);
   electron.ipcMain.on("open-file-dialog", function(event) {
     electron.dialog.showOpenDialog(win, {
-      properties: ["openDirectory"]
+      properties: ["openDirectory", "createDirectory"]
     }).then((result) => {
       let filepaths = result.filePaths;
       console.log(result);

@@ -50,6 +50,7 @@
     "multi-ini": "^2.3.2",
     "mustache": "^4.2.0",
     "node-fetch": "^3.3.2",
+    "splitpanes": "^3.1.5",
     "update-electron-app": "^2.0.1",
     "vue-codemirror6": "^1.1.27",
     "vue-json-editor": "^1.4.3",

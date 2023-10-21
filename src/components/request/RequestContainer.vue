@@ -10,7 +10,7 @@ import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/mode-javascript";
 // import "ace-builds/src-noconflict/theme-chrome";
 import "ace-builds/src-noconflict/mode-graphqlschema";
-import "ace-builds/src-noconflict/mode-graphql";
+// import "ace-builds/src-noconflict/mode-graphql";
 // import workerJsonUrl from "ace-builds/src-noconflict/worker-json?url"; // For vite
 // import ace from "ace-builds";
 // import themeChromeUrl from "ace-builds/src-noconflict/theme-chrome?url";
@@ -32,7 +32,7 @@ const httpurl = ref("")
 const requestBody = ref("")
 const params = ref<NameValueEnabled[]>([])
 const headers = ref<NameValueEnabled[]>([])
-const requestScript = ref("")
+const requestScript = ref("test")
 const contentTypes = ref<any[]>([])
 const selectedContentType = ref("none")
 const gqlQueryBody = ref("")
@@ -341,13 +341,13 @@ watchEffect(() => {
                   <el-text>query</el-text>
                   <v-ace-editor v-model:value="gqlQueryBody" @update:value="onGqlQueryBodyChange" lang="graphql"
                     :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
-                    style="height: 300px" />
+                    style="height: 350px" />
                 </el-col>
                 <el-col :span="8">
                   <el-text>variables</el-text>
                   <v-ace-editor v-model:value="gqlVariable" @update:value="onGqlVariableChange" lang="json"
                     :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
-                    style="height: 300px" />
+                    style="height: 350px" />
                 </el-col>
               </el-row>
               <el-row v-if="selectedContentType == 'application/x-www-form-urlencoded'">
@@ -381,7 +381,7 @@ watchEffect(() => {
                 <el-col>
                   <v-ace-editor v-model:value="requestBody" @update:value="onRequestBodyChange" lang="json"
                     :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
-                    style="height: 300px" />
+                    style="height: 200px" />
                 </el-col>
               </el-row>
             </el-tab-pane>
@@ -390,7 +390,7 @@ watchEffect(() => {
                 <el-col>
                   <v-ace-editor v-model:value="requestScript" @update:value="onRequestScriptChange" lang="javascript"
                     :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
-                    style="height: 300px" />
+                    style="height: 200px" />
                 </el-col>
               </el-row>
             </el-tab-pane>
@@ -447,7 +447,6 @@ watchEffect(() => {
   padding: 10px;
 
   margin-right: 10px;
-  height: 98%;
   overflow-y: scroll;
   text-align: left;
 }

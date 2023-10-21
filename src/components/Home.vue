@@ -13,9 +13,9 @@ import { truncateText, readFileContent } from '../services/utils'
 import Environment from './settings/Environment.vue'
 
 // @ts-ignore
-import SplitPane from "vue3-page-split";
+import { Splitpanes, Pane } from 'splitpanes'
+import 'splitpanes/dist/splitpanes.css'
 
-import "vue3-page-split/dist/style.css";
 import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
 import { EnvironmentService } from '../services/EnvironmentService'
@@ -30,6 +30,7 @@ import { Environment as EnvironmentModel, EnvironmentParam } from "../models/Env
 
 import { Request } from '../models/Request';
 
+
 const mustache = require('mustache');
 const vm = require('node:vm');
 
@@ -40,7 +41,7 @@ const emit = defineEmits([]);
 
 // Variables
 //
-const item = ref<any>()
+const item = ref<any>({})
 const requestFilePath = ref("")
 const workspace = ref("")
 const environ = ref("default")
@@ -101,6 +102,14 @@ const onSaveRequest = (request: Request) => {
   } catch (err) {
     NotificationService.showMessage("Failed to save request. " + err)
   }
+}
+
+const isRequestSelected = () => {
+  let isRequestSelectionAvail = false;
+  if (StorageService.isExists(requestFilePath.value)){
+    isRequestSelectionAvail = true
+  }
+  return isRequestSelectionAvail
 }
 
 const envSelectChange = (item: any) => {
@@ -182,7 +191,7 @@ const onSendRequest = (requestTemplate: any) => {
     }
     let url = request.httpurl
 
-    if (request.params.length > 0) {
+    if (request.params && request.params.length > 0) {
       url = url + "?"
       for (let paramIndex in request.params) {
         let paramName = request.params[paramIndex].name
@@ -358,26 +367,22 @@ onMounted(() => {
       </el-col>
 
     </el-row>
-    <el-row v-if="workspace != ''">
+    <el-row v-if="workspace != ''" style="height:100%">
       <el-col :span="5">
         <WorkspaceFolder :workspace-dir="workspace" @on-request-clicked="onRequestSelected" :msg="true"></WorkspaceFolder>
       </el-col>
-      <el-col :span="19">
-        <SplitPane backgroundColor="rgb(250,250,250)" :distribute="0.5" :lineThickness="2" :isVertical="false"
-          @resizeLineStartMove="onresizeLineStartMove" @resizeLineMove="onResizeLineMove"
-          @resizeLineEndMove="onresizeLineEndMove">
-          <template v-slot:first>
+      <el-col :span="19" >
+        <div ><el-text  v-if="!isRequestSelected()">Please select or create a request</el-text></div> 
+        <splitpanes v-if="isRequestSelected()" horizontal>
+          <pane>
             <RequestContainer :sendloading="sendloading" @on-save-request="onSaveRequest" @on-send-request="onSendRequest"
               :item="item">
             </RequestContainer>
-          </template>
-          <template v-slot:second>
+          </pane>
+          <pane>
             <ResponseContainer :sendloading="sendloading" :item="item"></ResponseContainer>
-          </template>
-        </SplitPane>
-
-
-
+          </pane>
+        </splitpanes>
       </el-col>
     </el-row>
 
@@ -427,5 +432,14 @@ onMounted(() => {
   margin-top: 7px;
   margin-left: 10px;
   margin-bottom: 10px;
+}
+.request-response-col{
+  height: 100%;
+  align-items: center;
+}
+.splitpanes__pane {
+  border-top:solid #EEE 1px;
+  border-bottom:solid #EEE 1px;
+  height:3px;
 }
 </style>
