@@ -284,7 +284,7 @@ watchEffect(() => {
   </el-row>
   <el-col :span="24" v-if="fileList.length > 0">
     <el-tree-v2 :filter-method="filterMethod" ref="treeRef" @node-click="itemSelected"
-      @current-change="checkChange" :data="fileList" :props="treeprops" />
+      @current-change="checkChange" :data="fileList" :props="treeprops" :height="900"/>
   </el-col>
 </template>
 

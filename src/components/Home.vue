@@ -20,6 +20,7 @@ import { ProfileService } from '../services/ProfileService'
 import { NotificationService } from '../services/NotificationService'
 import { EnvironmentService } from '../services/EnvironmentService'
 import ImportCollection from './settings/ImportCollection.vue'
+import ExportCollection from './settings/ExportCollection.vue'
 import { RequestService } from "../services/RequestService";
 import { ImportService } from "../services/ImportService";
 import { FalconService } from "../services/FalconService";
@@ -48,6 +49,7 @@ const environ = ref("default")
 const environmentsFormVisible = ref(false)
 const environments = ref<any>()
 const importFormVisible = ref(false)
+const exportFormVisible = ref(false)
 const sendloading = ref(false)
 
 //Global variables
@@ -145,6 +147,10 @@ const exportCollection = () => {
 const onImportComplete = () => {
   importFormVisible.value = false;
   refreshWorkspace();
+}
+
+const onExportComplete = () => {
+  exportFormVisible.value = false;
 }
 
 function encodeFormData(data: any) {
@@ -349,7 +355,7 @@ onMounted(() => {
     <el-row class="settings-row" v-if="workspace != ''">
       <el-col :span="5">
         <el-button class="import-button" @click="importFormVisible = true" :icon="DownloadIcon">Import</el-button>
-        <el-button class="export-button" @click="exportCollection" :icon="ExternalLinkIcon">Export</el-button>
+        <el-button class="export-button" @click="exportFormVisible = true" :icon="ExternalLinkIcon">Export</el-button>
       </el-col>
 
       <el-col :span="13" class="middle-menu">
@@ -394,12 +400,16 @@ onMounted(() => {
       <ImportCollection :directory="workspace" @on-import-complete="onImportComplete"></ImportCollection>
     </el-dialog>
 
+    <el-dialog v-model="exportFormVisible" title="Export request" width="50%" draggable>
+      <ExportCollection :directory="workspace" :request="item" @on-export-complete="onExportComplete"></ExportCollection>
+    </el-dialog>
+
   </div>
 </template>
 
 <style scoped>
 .home-view {
-  border: #EEE 1px solid;
+  
   border-radius: 5px;
   padding-bottom: 10px;
   height: 100%;

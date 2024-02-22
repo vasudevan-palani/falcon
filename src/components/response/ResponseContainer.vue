@@ -134,12 +134,12 @@ watchEffect(() => {
                 <el-col>
                   <v-ace-editor v-model:value="responseBody" @update:value="onResponseBodyChange" lang="json" :options="{
                     useWorker: true,
-                    showGutter: false,
+                    showGutter: true,
                     highlightActiveLine: false,
                     showPrintMargin: false,
                     readOnly: true,
                     wrap: true
-                  }" style="height: 200px" />
+                  }" style="height: 500px" />
                 </el-col>
               </el-row>
             </el-tab-pane>
@@ -163,6 +163,7 @@ watchEffect(() => {
   margin-right: 10px;
   overflow-y: scroll;
   text-align: left;
+  height: 100%;
   
 }
 .headers-col{

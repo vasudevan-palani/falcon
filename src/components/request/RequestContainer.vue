@@ -340,17 +340,17 @@ watchEffect(() => {
                 <el-col :span="16">
                   <el-text>query</el-text>
                   <v-ace-editor v-model:value="gqlQueryBody" @update:value="onGqlQueryBodyChange" lang="graphql"
-                    :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
+                    :options="{ useWorker: false, showGutter: true, highlightActiveLine: false, showPrintMargin: false }"
                     style="height: 350px" />
                 </el-col>
                 <el-col :span="8">
                   <el-text>variables</el-text>
                   <v-ace-editor v-model:value="gqlVariable" @update:value="onGqlVariableChange" lang="json"
-                    :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
+                    :options="{ useWorker: false, showGutter: true, highlightActiveLine: false, showPrintMargin: false }"
                     style="height: 350px" />
                 </el-col>
               </el-row>
-              <el-row v-if="selectedContentType == 'application/x-www-form-urlencoded'">
+              <el-row v-else-if="selectedContentType == 'application/x-www-form-urlencoded'">
                 <el-col>
                   <el-row class="actions-row">
                     <el-button :icon="PlusIcon" @click="addUrlEncodedParam">Add</el-button>
@@ -380,7 +380,7 @@ watchEffect(() => {
               <el-row v-else class="form-row">
                 <el-col>
                   <v-ace-editor v-model:value="requestBody" @update:value="onRequestBodyChange" lang="json"
-                    :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
+                    :options="{ useWorker: false, showGutter: true, highlightActiveLine: false, showPrintMargin: false }"
                     style="height: 200px" />
                 </el-col>
               </el-row>
@@ -389,7 +389,7 @@ watchEffect(() => {
               <el-row class="form-row">
                 <el-col>
                   <v-ace-editor v-model:value="requestScript" @update:value="onRequestScriptChange" lang="javascript"
-                    :options="{ useWorker: false, showGutter: false, highlightActiveLine: false, showPrintMargin: false }"
+                    :options="{ useWorker: false, showGutter: true, highlightActiveLine: false, showPrintMargin: false }"
                     style="height: 200px" />
                 </el-col>
               </el-row>
@@ -445,9 +445,10 @@ watchEffect(() => {
   border: #EEE 1px solid;
   border-radius: 5px;
   padding: 10px;
-
+  height: 100%;
   margin-right: 10px;
   overflow-y: scroll;
   text-align: left;
+  margin-bottom: 10px;
 }
 </style>
